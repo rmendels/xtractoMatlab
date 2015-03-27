@@ -1,4 +1,4 @@
-function [extract, lon, lat, time] = xtracto_3D(xpos,ypos,tpos,dtype)
+function [extract] = xtracto_3D(xpos,ypos,tpos,dtype)
 % Example script to get the large chunks of data via SWFSC/ERD THREDDS server
 %
 % INPUTS:  xpos = [xmin xmax] = longitude in 0 to 360 E lon, or -180 to 180 E lon
@@ -70,10 +70,24 @@ end
 dataStruct = erddapStruct(datatype);
 dataStruct = getMaxTime(dataStruct,urlbase1);
 
+xpos1=xpos;
+%convert input longitude to dataset longitudes
+if(dataStruct.lon360);
+  xpos1=make360(xpos1);
+else
+  xpos1=make180(xpos1);
+end;
+
+
 % Bathymetry is a special case lets get it out of the way
-%if(dataStruct.datasetname=='etopo360'||dataStruct.datasetname=='etopo180');
-%    out.array=getETOPO(dataStruct,xpos,ypos);
-%end;
+if(strcmp(dataStruct.datasetname,'etopo360')||strcmp(dataStruct.datasetname,'etopo180'));
+  [extract, result]=getETOPO(dataStruct,xpos1,ypos,urlbase);
+   if(result== -1);
+       error('error in getting ETOPO data - see error messages');
+   else
+      return;
+   end;
+end;
 
 
 %convert time format
@@ -84,13 +98,6 @@ udtpos=NaN(tposLen(1),1);
 tpos1=cellstr(tpos);
 for i=1:tposLen(1);
    udtpos(i)=datenum8601(tpos1{i});
-end;
-xpos1=xpos;
-%convert input longitude to dataset longitudes
-if(dataStruct.lon360);
-  xpos1=make360(xpos1);
-else
-  xpos1=make180(xpos1);
 end;
 
 xposLim=[min(xpos1), max(xpos1)];

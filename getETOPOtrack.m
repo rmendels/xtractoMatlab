@@ -17,6 +17,8 @@
 %  @return Named Data array with data, or else NaN
 
 function [extractStruct, returnCode] =  getETOPOtrack(dataStruct,xpos1,ypos,xrad,yrad,urlbase)
+options = weboptions;
+options.Timeout = Inf;
 returnCode=0;
 xlim1=min(xpos1);
 xlim2=max(xpos1);
@@ -39,30 +41,30 @@ if(strcmp(dataStruct.datasetname,'etopo360'));
      disp('xpos  (longtude) has elements out of range of the dataset');
      disp('longtiude range in xpos');
      disp(strcat(xlim1,',', xlim2));
-     returnCode=1;
+     returnCode= -1;
     end;
 else 
    if((xlim1 < -180) || (xlim2 > 180));
      disp('xpos  (longtude) has elements out of range of the dataset');
      disp('longtiude range in xpos');
      disp(strcat(xlim1,',', xlim2));
-     returnCode=1;
+     returnCode= -1;
    end;
 end;
 if((ylim1 < -90) || (ylim2 > 90));
     disp('ypos  (latitude) has elements out of range of the dataset');
     disp('latitude range in ypos');
     disp(strcat(ylim1,',', ylim2));
-    returnCode=1;
+    returnCode= -1;
 end;
 
 if(returnCode == 0) ;
    myURL=strcat(urlbase,dataStruct.datasetname,'.csv?latitude[0:1:last]');
-   temp=webread(myURL);
+   temp=webread(myURL,options);
    temp1=table2array(temp(2:end,1));
    latitude=str2num(char(temp1));
    myURL=strcat(urlbase,dataStruct.datasetname,'.csv?longitude[0:1:last]');
-   temp=webread(myURL);
+   temp=webread(myURL,options);
    temp1=table2array(temp(2:end,1));
    longitude=str2num(char(temp1));
    for i = 1:length(xpos);

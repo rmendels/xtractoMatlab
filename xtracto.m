@@ -48,25 +48,29 @@ end
 extract=ones(size(tpos,1),11)*NaN;     
 dataStruct = erddapStruct(datatype);
 dataStruct = getMaxTime(dataStruct,urlbase1);
-% Bathymetry is a special case lets get it out of the way
-%if(dataStruct.datasetname=='etopo360'||dataStruct.datasetname=='etopo180');
-%    out.array=getETOPO(dataStruct,xpos,ypos);
-%end;
-%convert time format
-%dateBase= datenum('1970-01-01-00:00:00');
-%secsDay = 86400;
-tposLen=size(tpos);
-udtpos=NaN(tposLen(1),1);
-tpos1=cellstr(tpos);
-for i=1:tposLen(1);
-   udtpos(i)=datenum8601(tpos1{i});
-end;
 xpos1=xpos;
 %convert input longitude to dataset longitudes
 if(dataStruct.lon360);
   xpos1=make360(xpos1);
 else
   xpos1=make180(xpos1);
+end;
+
+% Bathymetry is a special case lets get it out of the way
+if(strcmp(dataStruct.datasetname,'etopo360')||strcmp(dataStruct.datasetname,'etopo180'));
+  [extractStruct, result]=getETOPOtrack(dataStruct,xpos1,ypos,xrad,yrad,urlbase);
+   if(result== -1);
+       error('error in getting ETOPO data - see error messages');
+   else
+      return;
+   end;
+end;
+
+tposLen=size(tpos);
+udtpos=NaN(tposLen(1),1);
+tpos1=cellstr(tpos);
+for i=1:tposLen(1);
+   udtpos(i)=datenum8601(tpos1{i});
 end;
 
 if length(xrad) == 1;
