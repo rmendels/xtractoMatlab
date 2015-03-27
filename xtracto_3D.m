@@ -38,7 +38,13 @@ function [extract] = xtracto_3D(xpos,ypos,tpos,dtype)
 % v1.2 DGF  9 June 2007 - tweaked the dataid handling to pass
 %                         through CWBrowser requests 
 % v1.3 DGF 13 May 2011  - adjusted script to handle adjustment to coastwatch server
-%extract=xtracto_3D([230 240], [40 45],['2006-05-05'; '2006-06-21'], 18)
+%tpos{1} = '2006-05-05';
+%tpos{2} = '2006-06-21';
+%extract=xtracto_3D([230 240], [40 45],tpos, 20);
+
+if(~iscellstr(tpos));
+    error('tpos must be a cell-array of ISO times');
+end;
 
 % default URL for NMFS/SWFSC/ERD  THREDDS server
  urlbase='http://coastwatch.pfeg.noaa.gov/erddap/griddap/';
@@ -68,7 +74,6 @@ else
   end;
 end
 dataStruct = erddapStruct(datatype);
-dataStruct = getMaxTime(dataStruct,urlbase1);
 
 xpos1=xpos;
 %convert input longitude to dataset longitudes
@@ -89,16 +94,38 @@ if(strcmp(dataStruct.datasetname,'etopo360')||strcmp(dataStruct.datasetname,'eto
    end;
 end;
 
+%dataStruct = getMaxTime(dataStruct,urlbase1);
+[isotime, udtime, latitude,longitude, altitude]=getfileCoords(dataStruct, urlbase);
+lenTime=length(isotime);
+dataStruct.maxTime = isotime{lenTime};
+tpos1=tpos;
+isLast = strfind(tpos1{1},'last');
+if(isLast > 0);
+  tempTime = tpos1{1};
+  tlen = size(tempTime,2);
+  arith = tempTime(5:tlen);
+  tempVar = strcat('tIndex = ', num2str(lenTime),arith);
+  junk = evalc(tempVar);
+  tpos1{1}=isotime(tIndex);
+end;
+
+isLast = strfind(tpos1{2},'last');
+if(isLast > 0);
+  tempTime = tpos1{2};
+  tlen = size(tempTime,2);
+  arith = tempTime(5:tlen);
+  tempVar = strcat('tIndex = ', num2str(lenTime),arith);
+  junk = evalc(tempVar);
+  tpos1{2}=isotime(tIndex);
+end;
 
 %convert time format
 %dateBase= datenum('1970-01-01-00:00:00');
 %secsDay = 86400;
-tposLen=size(tpos);
-udtpos=NaN(tposLen(1),1);
-tpos1=cellstr(tpos);
-for i=1:tposLen(1);
-   udtpos(i)=datenum8601(tpos1{i});
-end;
+udtpos=NaN(2,1);
+udtpos(1)=datenum8601(tpos1{1});
+udtpos(1)=datenum8601(tpos1{2});
+
 
 xposLim=[min(xpos1), max(xpos1)];
 yposLim=[min(ypos), max(ypos)];
@@ -115,7 +142,6 @@ end;
 
 
 % get list of available time periods
-[isotime, udtime, latitude,longitude, altitude]=getfileCoords(dataStruct, urlbase);
 
 % define spatial bounding box
 lonBounds=[min(xpos1) max(xpos1)];

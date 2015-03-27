@@ -21,7 +21,9 @@ if((yposLim(1) < dataStruct.minLatitude)  || (yposLim(2) > dataStruct.maxLatitud
    extract=NaN;
 end 
 % check time
-if((tposLim(1) < dataStruct.minTime)  || (tposLim(2) > dataStruct.maxTime)) 
+minTime = dataStruct.minTime;
+maxTime = datenum8601(dataStruct.maxTime);
+if((tposLim(1) < minTime)  || (tposLim(2) > maxTime)) 
    disp('tpos  (time) has elements out of range of the dataset');
    disp('time range in tpos');
    disp(strcat(num2str(tposLim(1)),' , ', num2str(tposLim(2))));
