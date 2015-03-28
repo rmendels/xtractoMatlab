@@ -120,11 +120,11 @@ if(isLast > 0);
 end;
 
 %convert time format
-%dateBase= datenum('1970-01-01-00:00:00');
-%secsDay = 86400;
+dateBase= datenum('1970-01-01-00:00:00');
+secsDay = 86400;
 udtpos=NaN(2,1);
-udtpos(1)=datenum8601(tpos1{1});
-udtpos(1)=datenum8601(tpos1{2});
+udtpos(1)=datenum8601(char(tpos1{1}));
+udtpos(2)=datenum8601(char(tpos1{2}));
 
 
 xposLim=[min(xpos1), max(xpos1)];
@@ -188,4 +188,8 @@ elseif (min(xpos) < 0.);
 %request is on (-180,180)
    extract.longitude=make180(extract.longitude);
 end;
+%change time to isotime
+extract.time=(extract.time/secsDay)+dateBase;
+extract.time=datestr(extract.time);
+
 % fin

@@ -10,7 +10,7 @@ function [extractStruct] = xtracto(xpos,ypos,tpos,dtype,xrad,yrad)
 % 
 % xpos=[230 235];
 % ypos=[40 45];
-% tpos=['2006-01-15';'2006-01-20'];
+% tpos=cellstr(['2006-01-15';'2006-01-20']);
 % xlen=0.5;
 % ylen=0.5;
 % extract=xtracto(xpos, ypos,tpos, 20, xlen, ylen);
@@ -48,6 +48,7 @@ end
 extract=ones(size(tpos,1),11)*NaN;     
 dataStruct = erddapStruct(datatype);
 dataStruct = getMaxTime(dataStruct,urlbase1);
+disp(dataStruct.maxTime);
 xpos1=xpos;
 %convert input longitude to dataset longitudes
 if(dataStruct.lon360);
