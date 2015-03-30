@@ -175,6 +175,7 @@ fileout='tmp.mat';
 extract = getURL(myURL{1},fileout,dataStruct);
 % check if latitude is north-south and rotate if it is
 if(extract.latitude(2) < extract.latitude(1));
+   varname = dataStruct.varname;
    latSize=size(extract.latitude);
    extract.latitude=flipud(extract.latitude);
    cmd=strcat('extract.',varname,'=extract.',varname,'(:,fliplr(1:latSize(1)),:)' );
