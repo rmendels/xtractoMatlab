@@ -1,4 +1,4 @@
-function [extractStruct] = xtracto(xpos,ypos,tpos,dtype,xrad,yrad)
+function [extractStruct] = xtracto(xpos,ypos,tpos,dtype,xlen,ylen)
 % Script to grab data along a user specified track
 %
 % INPUTS:  xpos = longitude (in decimal degrees East, either 0-360 or -180 to 180)
@@ -47,8 +47,6 @@ else
 end
 extract=ones(size(tpos,1),11)*NaN;     
 dataStruct = erddapStruct(datatype);
-dataStruct = getMaxTime(dataStruct,urlbase1);
-disp(dataStruct.maxTime);
 xpos1=xpos;
 %convert input longitude to dataset longitudes
 if(dataStruct.lon360);
@@ -59,28 +57,31 @@ end;
 
 % Bathymetry is a special case lets get it out of the way
 if(strcmp(dataStruct.datasetname,'etopo360')||strcmp(dataStruct.datasetname,'etopo180'));
-  [extractStruct, result]=getETOPOtrack(dataStruct,xpos1,ypos,xrad,yrad,urlbase);
+  [extractStruct, result]=getETOPOtrack(dataStruct,xpos1,ypos,xlen,ylen,urlbase);
    if(result== -1);
        error('error in getting ETOPO data - see error messages');
    else
       return;
    end;
 end;
-
-tposLen=size(tpos);
+dataStruct = getMaxTime(dataStruct,urlbase1);
+tposLen=size(tpos,1);
 udtpos=NaN(tposLen(1),1);
 tpos1=cellstr(tpos);
 for i=1:tposLen(1);
    udtpos(i)=datenum8601(tpos1{i});
 end;
 
-if length(xrad) == 1;
-   xrad(1:length(xpos)) = xrad;
-end
-if length(yrad) == 1;
-   yrad(1:length(ypos)) = yrad;
-end  
-
+if length(xlen) == 1;
+   xrad(1:length(xpos1)) = xlen;
+else
+    xrad=xlen;
+end;
+if length(ylen) == 1;
+   yrad(1:length(ypos)) = ylen;
+else
+    yrad=ylen;
+end;
 xposLim=[min(xpos1-xrad/2), max(xpos1+xrad/2)];
 yposLim=[min(ypos-yrad/2), max(ypos+yrad/2)];
 tposLim=[min(udtpos), max(udtpos)];

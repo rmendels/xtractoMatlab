@@ -16,7 +16,7 @@
 %  @param urlbase A character string giving the base URL of the ERDDAP server
 %  @return Named Data array with data, or else NaN
 
-function [extractStruct, returnCode] =  getETOPOtrack(dataStruct,xpos1,ypos,xrad,yrad,urlbase)
+function [extractStruct, returnCode] =  getETOPOtrack(dataStruct,xpos1,ypos,xlen,ylen,urlbase)
 options = weboptions;
 options.Timeout = Inf;
 returnCode=0;
@@ -67,10 +67,20 @@ if(returnCode == 0) ;
    temp=webread(myURL,options);
    temp1=table2array(temp(2:end,1));
    longitude=str2num(char(temp1));
-   for i = 1:length(xpos);
+   if length(xlen) == 1;
+      xrad(1:length(xpos1)) = xlen;
+   else
+      xrad=xlen;
+   end;
+   if length(ylen) == 1;
+      yrad(1:length(ypos)) = ylen;
+   else
+      yrad=ylen;
+   end;
+   for i = 1:length(xpos1);
       % define bounding box
-      xmax=xpos(i)+xrad(i)/2;
-      xmin=xpos(i)-xrad(i)/2;
+      xmax=xpos1(i)+xrad(i)/2;
+      xmin=xpos1(i)-xrad(i)/2;
       if(dataStruct.latSouth);
         ymax=ypos(i)+yrad(i)/2;
         ymin=ypos(i)-yrad(i)/2;
@@ -102,10 +112,11 @@ if(returnCode == 0) ;
                     '[(',num2str(erddapLats(1)),'):1:(',num2str(erddapLats(2)),')]', ...
                     '[(',num2str(erddapLons(1)),'):1:(',num2str(erddapLons(2)),')]');
         fileout='tmp.mat';
-        downLoadReturn = getURL(myURL{1},fileout,dataStruct);
+        downLoadReturn = getURL(myURL,fileout,dataStruct);
         paramExp=strcat('param=downLoadReturn.',dataStruct.varname);
         junk=evalc(paramExp);
         param=squeeze(param);
+        param=double(param);
         paramIndex=find(~isnan(param));
         extract(i,1) = mean(param(paramIndex));
         extract(i,2) = std(param(paramIndex));
