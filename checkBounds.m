@@ -31,7 +31,7 @@ if((tposLim(1) < minTime)  || (tposLim(2) > maxTime))
    disp('time range in tpos');
    disp(strcat(num2str(tposLim(1)),' , ', num2str(tposLim(2))));
    disp ('time range in ERDDAP data');
-   disp(strcat(num2str(dataStruct.minTime),' , ', num2str(dataStruct.maxTime)));
+   disp(strcat(num2str(minTime),' , ', num2str(maxTime)));
    disp('execution stopped');
    extract=NaN;
 end
