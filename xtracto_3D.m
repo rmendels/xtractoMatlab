@@ -174,12 +174,14 @@ myURL = buildURL(dataStruct,erddapLons,erddapLats,erddapTimes,urlbase);
 fileout='tmp.mat';
 extract = getURL(myURL{1},fileout,dataStruct);
 % check if latitude is north-south and rotate if it is
-if(extract.latitude(2) < extract.latitude(1));
-   varname = dataStruct.varname;
-   latSize=size(extract.latitude);
-   extract.latitude=flipud(extract.latitude);
-   cmd=strcat('extract.',varname,'=extract.',varname,'(:,fliplr(1:latSize(1)),:)' );
-   junk=evalc(cmd);
+if (length(extract.latitude) > 1);
+   if(extract.latitude(2) < extract.latitude(1));
+      varname = dataStruct.varname;
+      latSize=size(extract.latitude);
+      extract.latitude=flipud(extract.latitude);
+      cmd=strcat('extract.',varname,'=extract.',varname,'(:,fliplr(1:latSize(1)),:)' );
+      junk=evalc(cmd);
+   end;
 end;
 %  put longitudes back on the requestors scale
 %  reqeust is on (0,360), data is not
