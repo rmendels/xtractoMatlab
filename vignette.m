@@ -62,3 +62,17 @@ tpos{1} = 'last-5';
 tpos{2} = 'last';
 poes = xtracto_3D(xpos,ypos,tpos,'agsstamday');
 
+%% xtractogon examples
+
+% chla in sanctuary
+tpos{1} = '2014-09-01';
+tpos{2} = '2014-10-01';
+xpoly = mbnms(:,1);
+ypoly = mbnms(:,2);
+sanctchl <- xtractogon(xpoly,ypoly,tpos,'erdVH2chlamday');
+
+% sanctuary bathymetry
+bathy = xtractogon(xpoly,ypoly,tpos,'ETOPO180');
+
+
+

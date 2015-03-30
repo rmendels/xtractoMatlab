@@ -1,4 +1,4 @@
-function [extract, xlon, xlat, xtime] = xtractogon(polyfile,tpos,id);
+function [extract, xlon, xlat, xtime] = xtractogon(xpoly,ypoly,tpos,id);
 % 
 % Function XTRACTOGON downloads a 3-D data chunk 
 % and applies a two-D spatial mask along the t-axis.
@@ -25,33 +25,31 @@ function [extract, xlon, xlat, xtime] = xtractogon(polyfile,tpos,id);
 % DGF
 %
 
-% set up path where xtracto_3D_bdap.m resides
-%path(path,'/u00/becker/mfiles');
-
-% just in case someone inputs a numerical data id
-if ~isstr(id)
-  id = num2str(id);
-end
 
 % read in polygon file
-a=load(polyfile);
-xpoly = a(:,1);
-ypoly = a(:,2);
-
 % set up vectors for call to xtracto
 xmin = min(xpoly); 
 xmax = max(xpoly);
 ymin = min(ypoly);
 ymax = max(ypoly);
-tmin = min(tpos);
-tmax = max(tpos);
+tmin = tpos{1};
+tmax= tpos{2};
+%tmin = min(tpos);
+%tmax = max(tpos);
 
 xpos = [xmin xmax];
 ypos = [ymin ymax];
 
 % call xtracto to get data
-[extract xlon xlat xtime] = xtracto_3D(xpos,ypos,tpos,id);
-[nt nz ny nx] = size(extract);
+extract = xtracto_3D(xpos,ypos,tpos,id);
+names=fieldnames(extract);
+if (strmatch('time',names));
+   nt=size(extract.time,1);
+else
+    nt =1;
+end;
+ny=size(extract.latitude);
+nx=size(extract.longitude);
 
 % make sure polygon is closed; if not, close it.
 if (xpoly(end) ~= xpoly(1)) | (ypoly(end) ~= ypoly(1)) 
@@ -60,14 +58,17 @@ if (xpoly(end) ~= xpoly(1)) | (ypoly(end) ~= ypoly(1))
 end
 
 % make mask (1 = in or on), (nan = out)
-[XLON XLAT] = meshgrid(xlon,xlat);
+[XLON XLAT] = meshgrid(extract.longitude,extract.latitude);
 [IN ON] = inpolygon(XLON,XLAT,xpoly,ypoly);
 mask2D = IN | ON;
 
 mask4D = permute(repmat(mask2D,[1 1 1 nt]),[4 3 1 2]);
+names=fieldnames(extract);
 
 % apply mask to 4-D array
-extract(~mask4D) =  nan;
+cmd=strcat('extract.',names{end},'(~mask4D)=nan' );
+junk=evalc(cmd);
+%extract(~mask4D) =  nan;
 
 
 % fin
