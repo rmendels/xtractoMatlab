@@ -59,6 +59,7 @@ for i= 1:structLength;
     tempStruct=getMaxTime(tempStruct,urlbase1);
     tempStruct.minTime=(tempStruct.minTime/secsDay)+dateBase;
     tempStruct.minTime=datestr(tempStruct.minTime,'yyyy-mm-dd');
+    tempStruct.maxTime=datestr(tempStruct.maxTime,'yyyy-mm-dd');
     tempStruct.timeSpacing = tempStruct.timeSpacing/secsDay;
     disp(tempStruct);
 end;

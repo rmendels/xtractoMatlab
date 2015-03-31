@@ -71,7 +71,7 @@ ascat = xtracto_3D(xpos,ypos,tpos,'erdQAstress3daytauy');
 quikscat = xtracto_3D(xpos,ypos,tpos,'erdQSstress3daytauy');
 times=datenum(ascat.time);
 plot(times,double(ascat.tauy),times, double(quikscat.tauy));
-datetick('x','mmm')
+datetick('x','mmm');
 
 % last times
 xpos = [235 240];
@@ -104,6 +104,16 @@ bathy = xtractogon(xpoly,ypoly,tpos,'ETOPO180');
 depth=double(bathy.altitude);
 depth(depth==0)=NaN;
 makeMap(bathy.longitude, bathy.latitude, depth);
+
+%getInfo examples
+getInfo('mhchla8day');
+getInfo('mbchla8day') ;
+
+% searchData example
+myList=cell(2,2);
+myList(1,1:2)={'varname';'chl'}';
+myList(2,1:2)={'datasetname';'mday'}';
+searchData(mylist);
 
 
 
