@@ -33,14 +33,16 @@ end;
 if ischar(dtype);
   datatype = find(strcmp(dtypename,dtype), 1);
   if(isempty(datatype));
-    disp('dataset name: ', dtype);
+    tempStr=strcat('dataset name: ', num2str(dtype));
+    disp(tempStr);
     disp('no matching dataset found');
     return;      
   end;
 else
   datatype = dtype;
   if ((datatype < 1) || (datatype > structLength(1)));
-    disp('dataset number out of range - must be between 1 and 107: ', datatype);
+    tempStr=strcat('dataset number out of range - must be between 1 and 107: ', num2str(datatype));
+    disp(tempStr);
     disp('routine stops');
     return;
   end;
