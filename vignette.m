@@ -15,12 +15,7 @@ topo = xtracto(xpos,ypos,tpos,'ETOPO360',.1,.1)
 %% gridded data examples
 xpos = [235 240];
 ypos = [36 39];
-tpos = ['1998-01-01';'2014-11-30']; 
 
-% Seawifs chla this will cause an error
-SeaWiFS= xtracto_3D(xpos, ypos, tpos, 'swchlamday');
-
-%this fixes the error
 tpos{1} = '1998-01-16';
 tpos{2} = 'last';
 
@@ -32,6 +27,7 @@ makeMap(SeaWiFS.longitude-360, SeaWiFS.latitude, log(chla));
 tpos{1}='2003-01-16';
 MODIS = xtracto_3D(xpos, ypos, tpos,'mhchlamday');
 chla=double(squeeze(MODIS.chlorophyll(1,:,:)));
+figure;
 makeMap(MODIS.longitude-360, MODIS.latitude, log(chla));
 
 % VIIS chla for same bounds
