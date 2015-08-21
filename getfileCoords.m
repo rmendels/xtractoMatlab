@@ -24,4 +24,6 @@ if(hasAltitude);
    temp=webread(myURL,options);
    temp1=table2array(temp(2:end,1));
    altitude=str2num(char(temp1));
+else
+    altitude=NaN;
 end;
