@@ -5,6 +5,8 @@ Matlab Version of xtractomatic package
 
 To download either clone using Git, or just click on the button to download a zip of the files. Requires a version of Matlab that supports webread, websave and weboptions.  The file `vignette.m` contains code that executes all of the examples in the R <span style="color:blue">xtractomatic</span> package ( <https://github.com/rmendels/xtractomatic>).  A pdf version of the R vignette  can be downloaded from http://coastwatch.pfeg.noaa.gov/xtracto or email me at roy.mendelssohn@noaa.gov
 
+This is considered alpha quality at the moment.  It can run the examples in the vignette.m file but otherwise has not been extensively tested.
+
 # Required legalese
 
 “The United States Department of Commerce (DOC) GitHub project code is provided
