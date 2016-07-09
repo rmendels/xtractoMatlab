@@ -9,9 +9,9 @@ This is considered alpha quality at the moment.  It can run the examples in the 
 
 # Revision notes 8 July 2016
 
-*Fixed a problem with webread starting with R2016a that broke all the routines
-*Added a few datasets
-*Added what I hope is a public domain version of mad, so tha the Stat toolbox is not required.
+- Fixed a problem with webread starting with R2016a that broke all the routines
+- Added a few datasets
+- Added what I hope is a public domain version of mad, so tha the Stat toolbox is not required.
 
 # Required legalese
 
