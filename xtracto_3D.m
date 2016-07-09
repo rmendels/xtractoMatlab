@@ -48,7 +48,7 @@ end;
 
 % default URL for NMFS/SWFSC/ERD  THREDDS server
  urlbase='http://coastwatch.pfeg.noaa.gov/erddap/griddap/';
- urlbase1='http://coastwatch.pfeg.noaa.gov/erddap/tabledap/allDatasets.csv?';
+ urlbase1='http://coastwatch.pfeg.noaa.gov/erddap/tabledap/allDatasets.json?';
  
 load('erddapStruct.mat','erddapStruct');
 %erddapStruct(1)

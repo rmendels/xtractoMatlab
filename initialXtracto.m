@@ -1,4 +1,4 @@
-structLength=154;
+structLength=155;
 erddapStruct = repmat(struct('dtypename','',...
 'datasetname','',...
 'longname','',...
@@ -1060,7 +1060,7 @@ structLength, 1 );
  erddapStruct(69).dtypename  ='erdG1ssta1day';
  erddapStruct(69).datasetname  ='erdG1ssta1day';
  erddapStruct(69).longname  ='SST, GHRSST Blended, MW-IR-OI, Science Quality, Global, 2006-2011 (1 Day Composite)';
- erddapStruct(69).varname  = 'analysed_sst';
+ erddapStruct(69).varname  = 'analyzed_sst';
  erddapStruct(69).hasAlt  =false;
  erddapStruct(69).lon360  =false;
  erddapStruct(69).minLongitude  =     -179.9561;
@@ -1075,7 +1075,7 @@ structLength, 1 );
  erddapStruct(70).dtypename  ='erdGRssta1day';
  erddapStruct(70).datasetname  ='erdGRssta1day';
  erddapStruct(70).longname  ='SST, GHRSST Blended, MW-IR-OI-RT, Near Real Time, Global (1 Day Composite)';
- erddapStruct(70).varname  = 'analysed_sst';
+ erddapStruct(70).varname  = 'analyzed_sst';
  erddapStruct(70).hasAlt  =false;
  erddapStruct(70).lon360  =false;
  erddapStruct(70).minLongitude  =     -179.9561;
@@ -2453,3 +2453,21 @@ erddapStruct(154).latitudeSpacing= 0.0125 ;
 erddapStruct(154).minAltitude=  0.;
 erddapStruct(154).maxAltitude=  0.;
 erddapStruct(154).infoURL=  'http://oceanwatch.pfeg.noaa.gov/thredds/dodsC/satellite/PPMW/1day.html';
+
+%  Hycom surface elevation;
+erddapStruct(155).dtypename='nrlHycomGLBu008e911S';
+erddapStruct(155).datasetname= 'nrlHycomGLBu008e911S';
+erddapStruct(155).longname='NRL HYCOM+NCODA, GLBu0.08/expt 91.1, Global, 1/12 deg, Apr 2014 to Now + Forecasts, at Surface';
+erddapStruct(155).varname ='surf_el';
+erddapStruct(155).hasAlt=false;
+erddapStruct(155).latSouth=true;
+erddapStruct(155).lon360=true;
+erddapStruct(155).minLongitude= 0.0;
+erddapStruct(155).maxLongitude= 359.92;
+erddapStruct(155).longitudeSpacing= 0.08 ;
+erddapStruct(155).minLatitude= -80.0;
+erddapStruct(155).maxLatitude= 80.0;
+erddapStruct(155).latitudeSpacing= 0.08;
+erddapStruct(155).minAltitude=  NaN;
+erddapStruct(155).maxAltitude=  NaN;
+erddapStruct(155).infoURL=  'http://oceanwatch.pfeg.noaa.gov/thredds/dodsC/satellite/PPMW/1day.html';
