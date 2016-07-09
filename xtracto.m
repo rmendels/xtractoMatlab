@@ -173,7 +173,7 @@ for i = 1:size(tpos,1);
       extract(i,8) = ymax;
       extract(i,9) = udtpos(i);
       extract(i,10) = median(param(paramIndex));
-%      extract(i,11) = mad(param(paramIndex));
+      extract(i,11) = mad(param(paramIndex));
    end;
  end;
  extractStruct=struct('mean',extract(:,1),'std',extract(:,2),'nobs',extract(:,3), ...
