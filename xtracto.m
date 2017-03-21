@@ -116,8 +116,8 @@ for i = 1:size(tpos,1);
 
 
   % define bounding box
-  xmax = xpos(i)+xrad(i)/2;
-  xmin = xpos(i)-xrad(i)/2;
+  xmax = xpos1(i)+xrad(i)/2;
+  xmin = xpos1(i)-xrad(i)/2;
   if(dataStruct.latSouth);
      ymax=ypos(i)+yrad(i)/2;
      ymin=ypos(i)-yrad(i)/2;
