@@ -159,6 +159,9 @@ if(iscell(myURL))
     myURL = myURL{1}
 end
 extract = getURL(info, myURL, fileout);
+f_names = fieldnames(extract);
+extract_parameter = f_names{end,:};
+
 % check if latitude is north-south and rotate if it is
 if (length(extract.latitude) > 1)
    if(extract.latitude(2) < extract.latitude(1))
@@ -184,6 +187,7 @@ if (length(extract.latitude) > 1)
       junk = evalc(cmd);
    end
 end
+junk = evalc(strcat('extract.', extract_parameter, '= squeeze(extract.', extract_parameter,')'));
 %  put longitudes back on the requestors scale
 %  reqeust is on (0,360), data is not
 if (max(xpos) > 180.)

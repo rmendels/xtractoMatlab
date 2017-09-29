@@ -12,7 +12,14 @@ if((xposLim(1) < info.dimensions.longitude.min)  || (xposLim(2) > info.dimension
 end
 % check latitudes
 % need to clean up for north to south datasets
-if((yposLim(1) < info.dimensions.latitude.min)  || (yposLim(2) > info.dimensions.latitude.max)) 
+if (info.dimensions.latitude.lat_south)
+    min_lat = info.dimensions.latitude.min;
+    max_lat = info.dimensions.latitude.max;
+else
+    min_lat = info.dimensions.latitude.max;
+    max_lat = info.dimensions.latitude.min;
+end    
+if((yposLim(1) < min_lat)  || (yposLim(2) > max_lat)) 
    disp('ypos  (latitude) has elements out of range of the dataset');
    disp('latitiude range in ypos');
    disp(strcat(num2str(yposLim(1)),' , ', num2str(yposLim(2))));
