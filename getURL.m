@@ -1,11 +1,12 @@
-function [extract] = getURL(myURL,destfile,dataStruct)
+function [extract] = getURL(info, myURL, destfile)
      options = weboptions;
      options.Timeout = Inf;
-    datasetname=dataStruct.datasetname;
-    varname=dataStruct.varname;
-    F=websave(destfile,myURL,options);
-    extract=load(F);
+     datasetname = info.access.datasetID;
+     F = websave(destfile, myURL, options);
+     extract = load(F);
 %  remove extra layer of structure
-    extract=eval(strcat('extract.',datasetname));
+    extract = eval(strcat('extract.', datasetname));
 %remove altitude dimension
-    junk=evalc(strcat('extract.',varname,'= squeeze(extract.',varname,')'));
+    f_names = fieldnames(extract);
+    extract_parameter = f_names{end,:};
+    junk = evalc(strcat('extract.', extract_parameter, '= squeeze(extract.', extract_parameter,')'));

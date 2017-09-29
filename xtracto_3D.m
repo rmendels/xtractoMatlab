@@ -1,10 +1,13 @@
-function [extract] = xtracto_3D(xpos,ypos,tpos,dtype)
+function [extract] = xtracto_3D(info, parameter, xpos, ypos, varargin )
 % Example script to get the large chunks of data via SWFSC/ERD THREDDS server
 %
-% INPUTS:  xpos = [xmin xmax] = longitude in 0 to 360 E lon, or -180 to 180 E lon
+% INPUTS:  
+%          info = result of call to function info()
+%          parameter = name of parameter to use from dataset referenced in
+%          info
+%          xpos = [xmin xmax] = longitude in 0 to 360 E lon, or -180 to 180 E lon
 %          ypos = [ymin ymax] = latitude -90 to 90 N lat
 %          tpos = [tpos tmax] = time, in matlab days  
-%          dtype = data ID Code (data types listed below)
 % 
 % OUTPUT:
 %
@@ -42,157 +45,157 @@ function [extract] = xtracto_3D(xpos,ypos,tpos,dtype)
 %tpos{2} = '2006-06-21';
 %extract=xtracto_3D([230 240], [40 45],tpos, 20);
 
-if(~iscellstr(tpos));
-    error('tpos must be a cell-array of ISO times');
-end;
-
-% default URL for NMFS/SWFSC/ERD  THREDDS server
- urlbase='http://coastwatch.pfeg.noaa.gov/erddap/griddap/';
- urlbase1='http://coastwatch.pfeg.noaa.gov/erddap/tabledap/allDatasets.json?';
- 
-load('erddapStruct.mat','erddapStruct');
-%erddapStruct(1)
-structLength=size(erddapStruct);
-dtypename=cell(structLength(1),1);
-for i=1:structLength(1);
-     dtypename{i}=erddapStruct(i,1).dtypename;
-end;
-% make sure data type input is a string and not a number
-if ischar(dtype);
-  datatype = find(strcmp(dtypename,dtype), 1);
-  if(isempty(datatype));
-    disp('dataset name: ', dtype);
-    disp('no matching dataset found');
-    return;      
-  end;
-else
-  datatype = dtype;
-  if ((datatype < 1) || (datatype > structLength(1)));
-    disp('dataset number out of range - must be between 1 and 107: ', datatype);
-    disp('routine stops');
-    return;
-  end;
+% check tpos is the form that is required
+numvarargs = length(varargin);
+tpos = NaN;
+if numvarargs > 0
+    tpos = varargin{1};
+    if(~iscellstr(tpos))
+        error('tpos must be a cell-array of ISO times');
+    end
 end
-dataStruct = erddapStruct(datatype);
 
-xpos1=xpos;
+% check that latitude and longitude exist
+if( ~info.dimensions.latitude.exists || ~info.dimensions.longitude.exists)
+    print('dataset must have both latitude and longitude');
+    if(~info.dimensions.latitude.exists)
+        print('latitude is missing');
+    end
+    if(~info.dimensions.longitude.exists)
+        print('longitude is missing');
+    end
+end
+
+xpos1 = xpos;
 %convert input longitude to dataset longitudes
-if(dataStruct.lon360);
-  xpos1=make360(xpos1);
+if(info.dimensions.longitude.lon360)
+  xpos1 = make360(xpos1);
 else
-  xpos1=make180(xpos1);
-end;
+  xpos1 = make180(xpos1);
+end
 
 
-% Bathymetry is a special case lets get it out of the way
-if(strcmp(dataStruct.datasetname,'etopo360')||strcmp(dataStruct.datasetname,'etopo180'));
-  [extract, result]=getETOPO(dataStruct,xpos1,ypos,urlbase);
-   if(result== -1);
-       error('error in getting ETOPO data - see error messages');
-   else
-      return;
-   end;
-end;
 
 %dataStruct = getMaxTime(dataStruct,urlbase1);
-[isotime, udtime, latitude,longitude, altitude]=getfileCoords(dataStruct, urlbase);
-lenTime=length(isotime);
-dataStruct.maxTime = isotime{lenTime};
-tpos1=tpos;
-isLast = strfind(tpos1{1},'last');
-if(isLast > 0);
-  tempTime = tpos1{1};
-  tlen = size(tempTime,2);
-  arith = tempTime(5:tlen);
-  tempVar = strcat('tIndex = ', num2str(lenTime),arith);
-  junk = evalc(tempVar);
-  tpos1{1}=isotime(tIndex);
-end;
+[isotime, udtime, altitude, latitude, longitude] = getfileCoords(info);
+tposLim = [NaN NaN];
+if (info.dimensions.time.exists)
+    lenTime = length(isotime);
+    tpos1 = tpos;
+    isLast = strfind(tpos1{1},'last');
+    if(isLast > 0)
+        tempTime = tpos1{1};
+        tlen = size(tempTime, 2);
+        arith = tempTime(5:tlen);
+        tempVar = strcat('tIndex = ', num2str(lenTime), arith);
+        junk = evalc(tempVar);
+        tpos1{1} = isotime(tIndex);
+    end
+      
+    isLast = strfind(tpos1{2}, 'last');
+    if(isLast > 0)
+        tempTime = tpos1{2};
+        tlen = size(tempTime, 2);
+        arith = tempTime(5:tlen);
+        tempVar = strcat('tIndex = ', num2str(lenTime), arith);
+        junk = evalc(tempVar);
+        tpos1{2} = isotime(tIndex);
+    end
+    % convert time format
+    dateBase = datenum('1970-01-01-00:00:00');
+    secsDay = 86400;
+    udtpos = NaN(2, 1);
+    udtpos(1) = datenum8601(char(tpos1{1}));
+    udtpos(2) = datenum8601(char(tpos1{2}));
+    tposLim = [min(udtpos), max(udtpos)];
+end
 
-isLast = strfind(tpos1{2},'last');
-if(isLast > 0);
-  tempTime = tpos1{2};
-  tlen = size(tempTime,2);
-  arith = tempTime(5:tlen);
-  tempVar = strcat('tIndex = ', num2str(lenTime),arith);
-  junk = evalc(tempVar);
-  tpos1{2}=isotime(tIndex);
-end;
-
-%convert time format
-dateBase= datenum('1970-01-01-00:00:00');
-secsDay = 86400;
-udtpos=NaN(2,1);
-udtpos(1)=datenum8601(char(tpos1{1}));
-udtpos(2)=datenum8601(char(tpos1{2}));
-
-
-xposLim=[min(xpos1), max(xpos1)];
-yposLim=[min(ypos), max(ypos)];
-tposLim=[min(udtpos), max(udtpos)];
+xposLim = [min(xpos1), max(xpos1)];
+yposLim = [min(ypos), max(ypos)];
 
 
 %check that coordinate bounds are contained in the dataset
-
-result=checkBounds(dataStruct,xposLim,yposLim,tposLim);
-if(isnan(result));
+result = checkBounds(info, tposLim, yposLim, xposLim);
+if (isnan(result))
   disp('Coordinates out of dataset bounds - see messages above');
   return;
-end;
+end
 
 
 % get list of available time periods
 
 % define spatial bounding box
-lonBounds=[min(xpos1) max(xpos1)];
-if(dataStruct.latSouth);
-  latBounds=[min(ypos) max(ypos)];
+lonBounds = [min(xpos1) max(xpos1)];
+if(info.dimensions.latitude.lat_south)
+  latBounds = [min(ypos) max(ypos)];
 else
-   latBounds=[max(ypos) min(ypos)];
-end;
+   latBounds = [max(ypos) min(ypos)];
+end
 
 %map request limits to nearest ERDDAP coordinates
-erddapLats= NaN(2,1);
-erddapLons= NaN(2,1);
-erddapTimes=cell(2,1);
+erddapLats = NaN(2, 1);
+erddapLons = NaN(2, 1);
+erddapTimes = cell(2, 1);
 [~,ind] = min(abs(latitude - latBounds(1)));
-erddapLats(1)=latitude(ind);
+erddapLats(1) = latitude(ind);
 [~,ind] = min(abs(latitude - latBounds(2)));
-erddapLats(2)=latitude(ind);
-[~,ind] = min(abs(longitude- lonBounds(1)));
+erddapLats(2) = latitude(ind);
+[~,ind] = min(abs(longitude - lonBounds(1)));
 erddapLons(1)=longitude(ind);
 [~,ind] = min(abs(longitude - lonBounds(2)));
 erddapLons(2)=longitude(ind);
-[~,ind] = min(abs(udtime- tposLim(1)));
-erddapTimes(1)=isotime(ind);
-[~,ind] = min(abs(udtime - tposLim(2)));
-erddapTimes(2)=isotime(ind);
+if (info.dimensions.time.exists)
+    [~,ind] = min(abs(udtime - tposLim(1)));
+    erddapTimes(1) = isotime(ind);
+    [~,ind] = min(abs(udtime - tposLim(2)));
+    erddapTimes(2) = isotime(ind);
+end
 
 
 % build the erddap url
-myURL = buildURL(dataStruct,erddapLons,erddapLats,erddapTimes,urlbase);
+myURL = buildURL(info, parameter, erddapTimes, altitude, erddapLats, erddapLons);
 fileout='tmp.mat';
-extract = getURL(myURL{1},fileout,dataStruct);
+if(iscell(myURL))
+    myURL = myURL{1}
+end
+extract = getURL(info, myURL, fileout);
 % check if latitude is north-south and rotate if it is
-if (length(extract.latitude) > 1);
-   if(extract.latitude(2) < extract.latitude(1));
-      varname = dataStruct.varname;
-      latSize=size(extract.latitude);
-      extract.latitude=flipud(extract.latitude);
-      cmd=strcat('extract.',varname,'=extract.',varname,'(:,fliplr(1:latSize(1)),:)' );
-      junk=evalc(cmd);
-   end;
-end;
+if (length(extract.latitude) > 1)
+   if(extract.latitude(2) < extract.latitude(1))
+      latSize = size(extract.latitude);
+      extract.latitude = flipud(extract.latitude);
+      % kluge - do by brute force to deal with different number of
+      % coordinates
+      if (info.dimensions.time.exists)
+          % has altitude
+          if(~isnan(altitude))
+              cmd = strcat('extract.', parameter, '= extract.', parameter, '(:, :, fliplr(1:latSize(1)), :)');
+          else
+              cmd = strcat('extract.', parameter, '= extract.', parameter, '(:, fliplr(1:latSize(1)), :)');
+          end
+      else
+          % has altitude
+          if(~isnan(altitude))
+              cmd = strcat('extract.', parameter, '= extract.', parameter, '(:, fliplr(1:latSize(1)), :)');
+          else
+              cmd = strcat('extract.', parameter, '= extract.', parameter, '(fliplr(1:latSize(1)), :)');
+          end
+      end
+      junk = evalc(cmd);
+   end
+end
 %  put longitudes back on the requestors scale
 %  reqeust is on (0,360), data is not
-if (max(xpos) > 180.);
-   extract.longitude=make360(extract.longitude);
-elseif (min(xpos) < 0.);
+if (max(xpos) > 180.)
+   extract.longitude = make360(extract.longitude);
+elseif (min(xpos) < 0.)
 %request is on (-180,180)
-   extract.longitude=make180(extract.longitude);
-end;
+   extract.longitude = make180(extract.longitude);
+end
 %change time to isotime
-extract.time=(extract.time/secsDay)+dateBase;
-extract.time=datestr(extract.time);
+if (info.dimensions.time.exists)
+    extract.time = (extract.time/secsDay) + dateBase;
+    extract.time = datestr(extract.time);
+end
 
 % fin
