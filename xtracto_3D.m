@@ -156,7 +156,7 @@ end
 myURL = buildURL(info, parameter, erddapTimes, altitude, erddapLats, erddapLons);
 fileout='tmp.mat';
 if(iscell(myURL))
-    myURL = myURL{1}
+    myURL = myURL{1};
 end
 extract = getURL(info, myURL, fileout);
 f_names = fieldnames(extract);

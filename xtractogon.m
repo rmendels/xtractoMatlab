@@ -47,11 +47,14 @@ xpos = [xmin xmax];
 ypos = [ymin ymax];
 
 % call xtracto to get data
-extract = xtracto_3D(info, parameter, xpos, ypos, tpos);
+if (isnan(tpos))
+    extract = xtracto_3D(info, parameter, xpos, ypos);
+else
+    extract = xtracto_3D(info, parameter, xpos, ypos, tpos);
+end
 names = fieldnames(extract);
 xtime = NaN;
 if (strmatch('time', names))
-   size(extract.time) 
    nt = size(extract.time, 1);
    xtime = extract.time;
 else
