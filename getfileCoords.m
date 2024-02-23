@@ -20,11 +20,13 @@ end
 myURL = strcat(urlbase, 'griddap/', info.access.datasetID, '.csv?latitude[0:1:last]');
 temp = webread(myURL, options);
 temp1 = table2array(temp(2:end, 1));
-latitude = str2num(char(temp1));
+% latitude = str2num(char(temp1));
+latitude = temp1;
 myURL = strcat(urlbase, 'griddap/', info.access.datasetID, '.csv?longitude[0:1:last]');
 temp = webread(myURL,options);
 temp1 = table2array(temp(2:end, 1));
-longitude = str2num(char(temp1));
+% longitude = str2num(char(temp1));
+longitude = temp1;
 if(info.dimensions.altitude.exists)
    myURL = strcat(urlbase, 'griddap/', info.access.datasetID, '.csv?altitude[0:1:last]');
    temp = webread(myURL, options);

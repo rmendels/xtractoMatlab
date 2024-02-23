@@ -47,11 +47,17 @@ function [extract] = xtracto_3D(info, parameter, xpos, ypos, varargin )
 
 % check tpos is the form that is required
 numvarargs = length(varargin);
-tpos = NaN;
 if numvarargs > 0
-    tpos = varargin{1};
-    if(~iscellstr(tpos))
-        error('tpos must be a cell-array of ISO times');
+    tpos_test = find(strcmp('tpos', varargin));
+    if (~isempty(tpos_test))
+            tpos = varargin{tpos_test + 1}; 
+            if(~iscellstr(tpos))
+                error('tpos must be a cell-array of ISO times');
+            end
+    end
+    zpos_test = find(strcmp('zpos', varargin));
+    if (~isempty(zpos_test))
+        zpos = varargin{zpos + 1};
     end
 end
 
@@ -78,6 +84,7 @@ end
 
 %dataStruct = getMaxTime(dataStruct,urlbase1);
 [isotime, udtime, altitude, latitude, longitude] = getfileCoords(info);
+%latitude(1:5)
 tposLim = [NaN NaN];
 if (info.dimensions.time.exists)
     lenTime = length(isotime);
@@ -136,7 +143,10 @@ end
 erddapLats = NaN(2, 1);
 erddapLons = NaN(2, 1);
 erddapTimes = cell(2, 1);
+size(latitude)
+size(latBounds)
 [~,ind] = min(abs(latitude - latBounds(1)));
+ind
 erddapLats(1) = latitude(ind);
 [~,ind] = min(abs(latitude - latBounds(2)));
 erddapLats(2) = latitude(ind);

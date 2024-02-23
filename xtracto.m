@@ -19,6 +19,7 @@ function [extractStruct] = xtracto(info, parameter, xpos, ypos, varargin)
 
 numvarargs = length(varargin);
 tpos = NaN;
+zpos = NaN;
 xlen = 0.;
 ylen = 0.;
 if numvarargs > 0
@@ -28,6 +29,10 @@ if numvarargs > 0
             if(~iscellstr(tpos))
                 error('tpos must be a cell-array of ISO times');
             end
+    end
+    zpos_test = find(strcmp('zpos', varargin));
+    if (~isempty(zpos_test))
+        zpos = varargin{zpos + 1};
     end
     xlen_test = find(strcmp('xlen', varargin));
     if (~isempty(xlen_test))
