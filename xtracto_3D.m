@@ -61,7 +61,7 @@ function [extract] = xtracto_3D(info, parameter, xpos, ypos, varargin )
     % Here assuming they don't have default values and thus not adding a default value
     % Example: addParameter(p, 'tpos', defaultTpos, @isnumeric);
     % Example: addParameter(p, 'zpos', defaultZpos, @isnumeric);
-    addParameter(p, 'tpos', [], @iscellst); % Assuming no default, will remain empty if not provided
+    addParameter(p, 'tpos', [], @iscellstr); % Assuming no default, will remain empty if not provided
     addParameter(p, 'zpos', [], @isnumeric); % Assuming no default, will remain empty if not provided
 
     % Parse the varargin input
@@ -75,38 +75,38 @@ function [extract] = xtracto_3D(info, parameter, xpos, ypos, varargin )
     zpos = p.Results.zpos;
 
     % check that latitude and longitude exist
-    if( ~info.dimensions.(yName).exists || ~info.dimensions.(xName).exists)
-        print('dataset must have both xpos and ypos');
-        if(~info.dimensions.(xpos).exists)
-            print('xpos is missing');
-        end
-        if(~info.dimensions.(ypos).exists)
-            print('ypos is missing');
-        end
-    end
+    %if( ~info.dimensions.(yName).exists || ~info.dimensions.(xName).exists)
+        %print('dataset must have both xpos and ypos');
+        %if(~info.dimensions.(xpos).exists)
+            %print('xpos is missing');
+        %end
+        %if(~info.dimensions.(ypos).exists)
+            %print('ypos is missing');
+        %end
+    %end
     
     
     
     % check tpos is the form that is required
-    if (~isempty(tpos))
-        if(~iscellstr(tpos))
-            error('tpos must be a cell-array of ISO times');
-        end
-    end
+    %if (~isempty(tpos))
+        %if(~iscellstr(tpos))
+            %error('tpos must be a cell-array of ISO times');
+        %end
+    %end
     
     
     xpos1 = xpos;
     %convert input longitude to dataset longitudes
-    if(info.dimensions.longitude.lon360)
-      xpos1 = make360(xpos1);
-    else
-      xpos1 = make180(xpos1);
-    end
+    %if(info.dimensions.longitude.lon360)
+      %xpos1 = make360(xpos1);
+    %else
+      %xpos1 = make180(xpos1);
+    %end
     
     
     
     %dataStruct = getMaxTime(dataStruct,urlbase1);
-    [isotime, udtime, altitude, latitude, longitude] = getfileCoords(info);
+    coordinate_info = getfileCoords(info);
     %latitude(1:5)
     tposLim = [NaN NaN];
     if (info.dimensions.time.exists)
