@@ -1,4 +1,4 @@
-function [extract] = xtracto_3D(info, parameter, xpos, ypos, varargin )
+function [extract] = xtracto_3D(dataInfo, parameter, xpos, ypos, varargin )
 % Example script to get the large chunks of data via SWFSC/ERD THREDDS server
 %
 % INPUTS:  
@@ -73,80 +73,68 @@ function [extract] = xtracto_3D(info, parameter, xpos, ypos, varargin )
     zName = p.Results.zName;
     tpos = p.Results.tpos;
     zpos = p.Results.zpos;
-
-    % check that latitude and longitude exist
-    %if( ~info.dimensions.(yName).exists || ~info.dimensions.(xName).exists)
-        %print('dataset must have both xpos and ypos');
-        %if(~info.dimensions.(xpos).exists)
-            %print('xpos is missing');
-        %end
-        %if(~info.dimensions.(ypos).exists)
-            %print('ypos is missing');
-        %end
-    %end
+    
+    dataInfo1 = dataInfo;
+    urlbase = dataInfo.access.urlBase;
+    urlbase <- checkInput(dataInfo1, parameter, urlbase, callDims);
+    if (isnumeric(urlbase)) 
+       if (urlbase == -999) 
+          error("error in inputs");
+      else 
+        error('url is not a valid erddap server');
+      end
+    end    
     
     
-    
-    % check tpos is the form that is required
-    %if (~isempty(tpos))
-        %if(~iscellstr(tpos))
-            %error('tpos must be a cell-array of ISO times');
-        %end
-    %end
-    
-    
-    xpos1 = xpos;
-    %convert input longitude to dataset longitudes
-    %if(info.dimensions.longitude.lon360)
-      %xpos1 = make360(xpos1);
-    %else
-      %xpos1 = make180(xpos1);
-    %end
-    
-    
-    
-    %dataStruct = getMaxTime(dataStruct,urlbase1);
-    coordinate_info = getfileCoords(info);
-    tposLim = [NaN NaN];
-    if (strcmp(coordinate_info.name, 'time'))
-        tposLim = [NaN NaN];
-        isotime = coordinate_info.time.isotime
-        lenTime = length(isotime);
-        tpos1 = tpos;
-        isLast = strfind(tpos1{1},'last');
-        if(isLast > 0)
-            tempTime = tpos1{1};
-            tlen = size(tempTime, 2);
-            arith = tempTime(5:tlen);
-            tempVar = strcat('tIndex = ', num2str(lenTime), arith);
-            junk = evalc(tempVar);
-            tpos1{1} = isotime(tIndex);
+    check tpos is the form that is required
+    if (~isempty(tpos))
+        if(~iscellstr(tpos))
+            error('tpos must be a cell-array of ISO times');
         end
-          
-        isLast = strfind(tpos1{2}, 'last');
-        if(isLast > 0)
-            tempTime = tpos1{2};
-            tlen = size(tempTime, 2);
-            arith = tempTime(5:tlen);
-            tempVar = strcat('tIndex = ', num2str(lenTime), arith);
-            junk = evalc(tempVar);
-            tpos1{2} = isotime(tIndex);
-        end
-        % convert time format
-        dateBase = datenum('1970-01-01-00:00:00');
-        secsDay = 86400;
-        udtpos = NaN(2, 1);
-        udtpos(1) = datenum8601(char(tpos1{1}));
-        udtpos(2) = datenum8601(char(tpos1{2}));
-        tposLim = [min(udtpos), max(udtpos)];
+    end    
+    
+    
+    dataCoordList = getfileCoords(dataInfo);
+    if (isnumeric(dataCoordList) ) 
+        error("Error retrieving coordinate variable");
+    end
+    working_coords = remapCoords(dataInfo1, callDims, dataCoordList,  urlbase);
+    dataInfo1 = working_coords$dataInfo1;
+    cross_dateline_180 = working_coords$cross_dateline_180;
+    xcoordLim = working_coords.xcoord1;
+    ycoordLim  = [min(working_coords.ycoord1), max(working_coords.ycoord1)];
+    
+    zcoordLim = NaN;
+    if (~isnan(working_coords.zcoord1)) 
+       zcoordLim = working_coords.zcoord1;
+       if (numel(zcoordLim) == 1)
+           zcoordLim <- [zcoordLim, zcoordLim];
+       end
     end
     
-    xposLim = [min(xpos1), max(xpos1)];
-    yposLim = [min(ypos), max(ypos)];
+    tcoordLim = [NaN, NaN];
+    if (~isnan(working_coords.tcoord1)) 
+        % check for last in time,  and convert
+        isoTime  = dataCoordList$time;
+        udtTime = datenum(isoTime, 'yyyy-mm-ddTHH:MM:SS');
+        tcoord1 = removeLast(isoTime, working_coords.tcoord1);
+        tcoord1 = datenum(tcoord1, 'yyyy-mm-ddTHH:MM:SS');
+        tcoordLim = tcoord1;
+    end
     
+    dimargs = struct(xName, xcoordLim, yName, ycoordLim, zName, zcoordLim, tName, tcoordLim);
+    % Get a list of field names
+    fieldNames = fieldnames(dimargs);
+    % Loop through each field, checking if it's empty
+    for i = length(fieldNames):-1:1
+        if isempty(dimargs.(fieldNames{i}))
+            % Remove the field if it's empty
+            dimargs = rmfield(dimargs, fieldNames{i});
+        end
+    end
     
     %check that coordinate bounds are contained in the dataset
-    result = checkBounds(info, tposLim, yposLim, xposLim);
+    result = checkBounds1(info, tposLim, yposLim, xposLim);
     if (isnan(result))
       disp('Coordinates out of dataset bounds - see messages above');
       return;
@@ -235,5 +223,5 @@ function [extract] = xtracto_3D(info, parameter, xpos, ypos, varargin )
         extract.time = (extract.time/secsDay) + dateBase;
         extract.time = datestr(extract.time);
     end
-    
+end    
     % fin

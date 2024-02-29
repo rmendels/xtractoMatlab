@@ -48,3 +48,4 @@ function [ info ] = erddapInfo( datasetID, varargin )
         end
     end
     info = struct('access', access, 'dimensions', dim_info);
+end
