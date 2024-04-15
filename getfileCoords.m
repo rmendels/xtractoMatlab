@@ -1,20 +1,19 @@
-function [coordinate_info] = getfileCoords(info)
+function [coordinate_info] = getfileCoords(datasetInfo)
     options = weboptions;
     options.Timeout = Inf;
-    urlbase = info.access.urlBase;
+    urlbase = datasetInfo.access.urlBase;
     %  loop over dimensions
-    no_dims = size(info.dimensions, 2);
-    names = arrayfun(@(x) x.name{1}, info.dimensions, 'UniformOutput', false);
-    coordinate_info(no_dims) = struct('name', '',  'values', '');
-    
-    for i = 1:size(info.dimensions, 2)
-        datasetID = info.access.datasetID;
-        dim_name = info.dimensions(i).name{1};
+    no_dims = numel(datasetInfo.dimensionNames);
+    %names = arrayfun(@(x) x.name{1}, datasetInfo.dimensions, 'UniformOutput', false);
+    %coordinate_info(no_dims) = struct('name', '',  'values', '');
+    datasetID = datasetInfo.access.datasetID;
+    for i = 1:no_dims
+        dim_name = datasetInfo.dimensionNames(i);
         myURL=strcat(urlbase, 'griddap/', datasetID, '.csv?', dim_name, '[0:1:last]');
         temp=webread(myURL,options);
-        temp1=table2array(temp(2:end, 1));
+        temp1=table2array(temp(1:end, 1));
         
-        if (strcmp(info.dimensions(i).name, 'time'))
+        if (strcmp(dim_name, 'time'))
             timeLength = size(temp1);
             %udtime = NaN(timeLength(1), 1);
             %for itime = 1:timeLength(1)
@@ -22,11 +21,11 @@ function [coordinate_info] = getfileCoords(info)
             %end
             %udtime(itime) = erddap8601(temp1{itime});  
             isotime = temp1;
-            coordinate_info(i).name = 'time';
-            coordinate_info(i).values = isotime';
+            coordinate_info.('time') = isotime';
+            %coordinate_info(i).name = 'time';
+            %coordinate_info(i).values = isotime';
         else
-            coordinate_info(i).values = temp1';  
-            coordinate_info(i).name = names(i)';  
+            coordinate_info.(dim_name) = temp1';  
         end
     end
 end

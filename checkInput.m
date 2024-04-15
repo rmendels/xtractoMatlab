@@ -1,26 +1,21 @@
-function urlbase = checkInput(dataInfo, parameter, urlbase, callDims)
+function urlbase = checkInput(datasetInfo, parameter, urlbase, callDims)
     % Initialize return code for error handling
     errorCode = -999;
-
-    % Check that a valid rerddap info structure is being passed
-    if ~isstruct(dataInfo) % Approximation: Checking if dataInfo is a structure
-        disp('error - dataInfo is not a valid info structure from rerddap');
+    
+    if(~any(strcmp('class', fieldnames(datasetInfo))
+        disp('error - datasetInfo is not a valid info structure from erddapInfo()')
         error('Function terminated with error code %d', errorCode);
     end
 
+
     % Check that the dataset is a grid
-    if ~isfield(dataInfo, 'alldata') || ~strcmp(dataInfo.alldata.NC_GLOBAL.value, 'Grid')
+    if(~strcmp(datasetInfo.cdm_type, 'Grid'))
         disp('error - dataset is not a Grid');
         error('Function terminated with error code %d', errorCode);
     end
 
-    % Assume getallvars and dimvars are implemented or replace with equivalent
-    allvars = getallvars(dataInfo); % Placeholder for actual implementation
-    allCoords = dimvars(dataInfo); % Placeholder for actual implementation
-
-    % Assuming callDims is a cell array or structure with non-empty fields
-    % MATLAB does not support direct filtering like R, so this part is conceptual
-    % Filtering non-empty fields if callDims is a structure
+    allvars = datasetInfo.variables; 
+    allCoords = datasetInfo.dimensionNames;
 
     % Test coordinate names
     namesTest = ismember(fieldnames(callDims), allCoords);
@@ -42,7 +37,7 @@ function urlbase = checkInput(dataInfo, parameter, urlbase, callDims)
     end
 
     % Check that the field given is part of the dataset
-    if ~ismember(parameter, allvars)
+    if ~ismember(string(parameter), string(allvars))
         disp('Parameter given is not in dataset');
         disp(['Parameter given: ', parameter]);
         disp(['Dataset Parameters: ', strjoin(allvars(numel(allCoords)+1:end), ', ')]);
@@ -56,8 +51,6 @@ function urlbase = checkInput(dataInfo, parameter, urlbase, callDims)
     end
 
     % Checking URL connection to an ERDDAP - Simplified version
-    % MATLAB does not have a direct equivalent to httr::HEAD, but you can use
-    % webread or urlread wrapped in a try-catch to attempt to connect to the server
     try
         webread(urlbase);
     catch
@@ -67,6 +60,3 @@ function urlbase = checkInput(dataInfo, parameter, urlbase, callDims)
 
     % If all checks pass, return the possibly modified urlbase
 end
-
-% Note: This translation assumes placeholders for `getallvars` and `dimvars` functions,
-% which need to be defined based on how they interact with the `dataInfo` structure.

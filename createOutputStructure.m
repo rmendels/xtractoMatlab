@@ -1,38 +1,23 @@
-function temp_struct = createOutputStructure(tempCoords, dataInfo, dataX, dataY, dataZ, datatime, parameter, callDims)
-    % Initialize an empty structure
-    temp_struct = struct();
-
-    % Assign provided arguments to the structure
-    temp_struct.param = tempCoords.param;
-    temp_struct.datasetid = dataInfo.datasetid;
-    temp_struct.dataX = dataX;
-    temp_struct.dataY = dataY;
-
-    % Assign dataZ and datatime based on callDims content
-    if ~isempty(callDims{3})
-        temp_struct.dataZ = dataZ;
-    else
-        temp_struct.dataZ = [];  % Or assign NaN or another placeholder if more appropriate
-    end
-
-    if ~isempty(callDims{4})
-        temp_struct.datatime = datatime;
-    else
-        temp_struct.datatime = [];  % Or assign NaN or another placeholder if more appropriate
-    end
-
-    % Rename fields based on the 'etopo' condition
-    if ~isempty(regexp(temp_struct.datasetid, 'etopo', 'once'))
-        % Define new names for the 'etopo' condition
-        newNames = {'depth', 'datasetname', 'X', 'Y', 'Z', 'time'};
-    else
-        % Define new names for the non-'etopo' condition, using 'parameter'
-        newNames = {parameter, 'datasetname', 'X', 'Y', 'Z', 'time'};
-    end
-
-    % Rename fields
-    temp_struct = renameFields(temp_struct, {'param', 'datasetid', 'dataX', 'dataY', 'dataZ', 'datatime'}, newNames);
+function erddapStruct = createOutputStructure(parameter, track)
+    f_names = string(fieldnames(track));
+    track_length = numel(track.(f_names(1)));
+    mean_name = strcat('mean', '_', parameter);
+    std_name = strcat('std', '_', parameter);
+    x_name_min = strcat('requested_', f_names(1), '_min');
+    x_name_max = strcat('requested_', f_names(1), '_max');
+    y_name_min = strcat('requested_', f_names(2), '_min');
+    y_name_max = strcat('requested_', f_names(2), '_max');
+    z_name_min = strcat('requested_', f_names(3), '_min');
+    z_name_max = strcat('requested_', f_names(3), '_max');
+    erddapStruct = struct(mean_name, NaN(1, track_length ), std_name,  NaN(1, track_length ), ...
+     'n', NaN(1, track_length ), 'satellite_date', strings(1, track_length), ...
+    x_name_min, NaN(1, track_length ), x_name_max, NaN(1, track_length ),...
+    y_name_min, NaN(1, track_length ), y_name_max, NaN(1, track_length ), ...
+    z_name_min, NaN(1, track_length ), z_name_max, NaN(1, track_length ), ...
+    'requested_date', strings(1, track_length), ...
+    'median', NaN(1, track_length ), 'mad', NaN(1, track_length ) );
 end
+
 
 % Function to rename fields of a structure
 function structOut = renameFields(structIn, oldNames, newNames)

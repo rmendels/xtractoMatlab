@@ -1,4 +1,4 @@
-function [extract] = xtracto_3D(datasetInfo, parameter, xpos, ypos, varargin )
+function [extract] = xtracto_3D(dataInfo, parameter, xpos, ypos, varargin )
 % Example script to get the large chunks of data via SWFSC/ERD THREDDS server
 %
 % INPUTS:  
@@ -81,58 +81,26 @@ function [extract] = xtracto_3D(datasetInfo, parameter, xpos, ypos, varargin )
     tName = inputInfo.Results.tName;
     tpos = inputInfo.Results.tpos;
     zpos = inputInfo.Results.zpos;
+    disp(zpos)
+    disp(zName)
+    disp(tpos)
+    disp(tName)
+    %callDims(1).name = xName;
+    %callDims(1).values = xpos;
+    %callDims(2).name = yName;
+    %callDims(2).values = ypos;
+    %callDims(3).name = zName;
+    % callDims(3).values = zpos;
+    %callDims(4).name = tName;
+    %callDims(4).values = tpos;
     callDims.(xName) = xpos;
     callDims.(yName) = ypos;
     callDims.(zName) = zpos;
     callDims.(tName) = tpos;
     
-    datasetInfo1 = datasetInfo;
-    dataCoordList = getfileCoords(datasetInfo);
-    if (isnumeric(dataCoordList) ) 
-        error("Error retrieving coordinate variable");
-    end
-    callDims = remapCoords(datasetInfo, callDims, dataCoordList,  0, 0);
-    time_dim = find(strcmp('time', dataCoordList));
-        
-    %check that coordinate bounds are contained in the dataset
-    %result = checkBounds1(info, tposLim, yposLim, xposLim);
-    %if (isnan(result))
-    %  disp('Coordinates out of dataset bounds - see messages above');
-    %  return;
-    %end
-    erddapCoords = findERDDAPcoords(dataCoordList, callDims);  
+    dataInfo1 = dataInfo;
+    dataCoordList = getfileCoords(dataInfo);
+    save('test_extract.mat', 'callDims', 'dataInfo', 'dataCoordList')
+    extract = 'junk'
     
-    % build the erddap url
-    myURL = buildURL(datasetInfo,  erddapCoords);
-    fileout='tmp.mat';
-    if(iscell(myURL))
-        myURL = myURL{1};
-    end
-    extract = getURL(datasetInfo, myURL, fileout);
-    f_names = fieldnames(extract);
-    extract_parameter = f_names{end,:};
-    if (strcmp('time', f_names))
-        extract.time = string(extract.time);
-    end
-    
-    % check if latitude is north-south and rotate if it is
-    if (strcmp('latitude', f_names))
-       if(extract.latitude(2) < extract.latitude(1))
-         lat_index = find(strcmp('latitude', f_names))
-         latSize = size(extract.latitude);
-         extract.latitude = flipud(extract.latitude);
-         extract.(extract_parameter) = rotatedArrays(extract.(extract_parameter), lat_index);
-       end
-    end
-    %  put longitudes back on the requestors scale
-    %  reqeust is on (0,360), data is not
-    if (strcmp('longitude', f_names))
-        if (max(xpos) > 180.)
-           extract.longitude = make360(extract.longitude);
-        elseif (min(xpos) < 0.)
-        %request is on (-180,180)
-           extract.longitude = make180(extract.longitude);
-        end
-    end
-end    
-    % fin
+end

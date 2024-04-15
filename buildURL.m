@@ -1,22 +1,25 @@
- function myURL = buildURL(info, parameter, timeBounds, altitude, latBounds, lonBounds)
-  urlbase = info.access.urlBase;
-  lon1 = lonBounds(1);
-  lon2 = lonBounds(2);
-  lat1 = latBounds(1);
-  lat2 = latBounds(2);
-  datasetname = info.access.datasetID;
-  varname = parameter;
-  myURL=strcat(urlbase, 'griddap/', datasetname, '.mat?', varname);
-  if (info.dimensions.time.exists)
-      time1 = timeBounds(1);
-      time2 = timeBounds(2);
-      time_temp = strcat('[(', time1, '):1:(', time2, ')]');
-      myURL = strcat(myURL, time_temp);
-  end
-  if (~isnan(altitude))
-      altitude_temp = strcat('[(',num2str(altitude),'):1:(',num2str(altitude),')]');
-      myURL = strcat(myURL, altitude_temp);
-  end
-  lat_temp = strcat('[(', num2str(lat1), '):1:(', num2str(lat2), ')]');
-  lon_temp = strcat( '[(', num2str(lon1), '):1:(', num2str(lon2), ')]');
-  myURL = strcat(myURL, lat_temp,  lon_temp);
+function myURL = buildURL(datasetInfo,  erddapCoords)
+    % Initialize the URL
+    urlbase = datasetInfo.access.urlBase;
+    datasetID = datasetInfo.access.datasetID;
+    datasetDim = datasetInfo.dimensionNames;
+    varname = datasetInfo.variables;
+    myURL=strcat(urlbase, 'griddap/', datasetID, '.mat?', varname);
+    callDimsNames  = fieldnames(erddapCoords);
+     % Loop through each field of the structure
+    for i = 1:numel(datasetDim)
+        % find name of  dimension  i in datasett
+        dimName = datasetDim(i);
+        values = erddapCoords.(dimName);
+        if strcmp(dimName{1}, 'time')
+            formattedStr = strcat('[(', values{1}, '):1:(', values{2}, ')]');
+        else 
+            if(~isempty(values))
+                value1 = num2str(values(1));
+                value2 = num2str(values(2));
+                formattedStr = strcat('[(', value1, '):1:(' , value2, ')]');
+            end
+        end
+        myURL = strcat(myURL, formattedStr);
+    end
+end
