@@ -1,4 +1,4 @@
-function [extract, xlon, xlat, xtime] = xtractogon(info, parameter, xpoly, ypoly, varargin);
+function [extract, xlon, xlat, xtime] = xtractogon(datasetInfo, parameter, xpoly, ypoly, varargin);
 % 
 % Function XTRACTOGON downloads a 3-D data chunk 
 % and applies a two-D spatial mask along the t-axis.
@@ -25,62 +25,98 @@ function [extract, xlon, xlat, xtime] = xtractogon(info, parameter, xpoly, ypoly
 % DGF
 %
 
+    % Create an instance of the inputParser class.
+    inputInfo = inputParser;
 
-% read in polygon file
-% set up vectors for call to xtracto
-numvarargs = length(varargin);
-tpos = NaN;
-if numvarargs > 0
-    tpos = varargin{1};
-    if(~iscellstr(tpos))
-        error('tpos must be a cell-array of ISO times');
+    % Set the default values for the optional parameters.
+    defaultXName = "longitude";
+    defaultYName = "latitude";
+    defaultZName = "altitude"; 
+    defaultTName = "time"; 
+    defaultUrlName = 'https://coastwatch.pfeg.noaa.gov/erddap/'; 
+
+    % Setup validation functions for string inputs
+    mustBeTextScalar = @(x) ischar(x) || (isstring(x) && isscalar(x));
+    
+    % Add optional name-value pairs
+    addParameter(inputInfo, 'xName', defaultXName, mustBeTextScalar);
+    addParameter(inputInfo, 'yName', defaultYName, mustBeTextScalar);
+    addParameter(inputInfo, 'zName', defaultZName, mustBeTextScalar);
+    addParameter(inputInfo, 'tName', defaultTName, mustBeTextScalar);
+     
+    % For numerical parameters, if they have default values, initialize them similarly
+    % Here assuming they don't have default values and thus not adding a default value
+    % Example: addParameter(p, 'tpoly', defaultTpos, @isnumeric);
+    % Example: addParameter(p, 'zpos', defaultZpos, @isnumeric);
+    addParameter(inputInfo, 'tpos', [], @(x) iscellstr(x) || isnumeric(x)); 
+    addParameter(inputInfo, 'zpos', [], @(x) iscellstr(x) || isnumeric(x)); 
+
+    % Parse the varargin input
+    parse(inputInfo, varargin{:});
+
+    % Extract the values
+    xName = inputInfo.Results.xName;
+    yName = inputInfo.Results.yName;
+    zName = inputInfo.Results.zName;
+    tName = inputInfo.Results.tName;
+    tpos = inputInfo.Results.tpos;
+    zpos = inputInfo.Results.zpos;
+    callDims.(xName) = xpoly;
+    callDims.(yName) = ypoly;
+    callDims.(zName) = zpos;
+    callDims.(tName) = tpos;
+
+
+
+    f_names = fieldnames(callDims);
+    xmin = min(xpoly); 
+    xmax = max(xpoly);
+    ymin = min(ypoly);
+    ymax = max(ypoly);
+    erddapCoord.(xName) = [xmin xmax];
+    erddapCoord.(yName) = [ymin ymax];
+    if (~isempty(zpos))
+        zmin = min(zpos);
+        zmax = max(zpos);
+        erddapCoord.(zName) = [zmin zmax];
     end
-    tmin = tpos{1};
-    tmax= tpos{2};
+    if (~isempty(tpos))
+        % convert to numbers to compare
+        temp_time = erddap8601(tpos);
+        [min_time,  min_index] = min(temp_time);
+        [max_time,  max_index] = max(temp_time);
+        erddapCoord.time = [tpos(min_index) tpos(max_index)];
+    end
+
+    % Initialize an empty cell array for extra dimension
+
+    extract = dynamicFunctionCall('xtracto_3D', datasetInfo, parameter, erddapCoord);
+    extract.(parameter) = squeeze(extract.(parameter));
+    
+    f_names = fieldnames(extract);
+    xtime = NaN;
+    % we want to mask for each time period
+    if (strmatch('time', f_names))
+       no_time = numel(string(extract.time));
+    else
+        no_time = 1;
+    end
+    
+    % make sure polygon is closed; if not, close it.
+    if (xpoly(end) ~= xpoly(1)) | (ypoly(end) ~= ypoly(1)) 
+         xpoly(end+1) = xpoly(1);
+         ypoly(end+1) = ypoly(1);
+    end
+    
+    % make mask (1 = in or on), (nan = out)
+    [xlon xlat] = meshgrid(extract.longitude, extract.latitude);
+    inPoly = inpolygon(xlon, xlat, xpoly, ypoly);
+    if (no_time == 1)
+        extract.(parameter)(~inPoly) = NaN;
+    else
+        for (i = 1:no_time)
+            extract.(parameter)(i, ~inPoly) = NaN;    
+        end
+    end
 end
-
-xmin = min(xpoly); 
-xmax = max(xpoly);
-ymin = min(ypoly);
-ymax = max(ypoly);
-xpos = [xmin xmax];
-ypos = [ymin ymax];
-
-% call xtracto to get data
-if (isnan(tpos))
-    extract = xtracto_3D(info, parameter, xpos, ypos);
-else
-    extract = xtracto_3D(info, parameter, xpos, ypos, tpos);
-end
-names = fieldnames(extract);
-xtime = NaN;
-if (strmatch('time', names))
-   nt = size(extract.time, 1);
-   xtime = extract.time;
-else
-    nt = 1;
-end
-ny = size(extract.latitude);
-nx = size(extract.longitude);
-
-% make sure polygon is closed; if not, close it.
-if (xpoly(end) ~= xpoly(1)) | (ypoly(end) ~= ypoly(1)) 
-     xpoly(end+1) = xpoly(1);
-     ypoly(end+1) = ypoly(1);
-end
-
-% make mask (1 = in or on), (nan = out)
-[xlon xlat] = meshgrid(extract.longitude, extract.latitude);
-[in on] = inpolygon(xlon, xlat, xpoly, ypoly);
-mask2D = in | on;
-
-mask4D = permute(repmat(mask2D, [1 1 1 nt]), [4 3 1 2]);
-names = fieldnames(extract);
-
-% apply mask to 4-D array
-cmd = strcat('extract.', names{end}, '(~mask4D)=nan' );
-junk = evalc(cmd);
-%extract(~mask4D) =  nan;
-
-
-% fin
+    % fin

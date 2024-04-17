@@ -1,4 +1,17 @@
 function subsetData = extractSubset(extract, erddapCoords1)
+% Internal function used by xtracto.m
+%
+% In xtracto.m for each unique satellite time
+% an extract is made for a box that includes the requests for all those instances 
+% and this function then subsets from that download for the given instance.
+%
+% INPUTS
+%    extract - the data from the large extract
+%    erddapCoords1 - the ecoordinates for one of the time periods
+% 
+% OUTPUT
+%   subsetData - an array with the subset of the data
+%
     f_names = string(fieldnames(erddapCoords1));
     f_names1 = string(fieldnames(extract));
     if (strcmp(f_names, 'time'))

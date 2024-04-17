@@ -6,13 +6,16 @@ function [] = makeMap_grid(extract, time_period, varargin)
     % Set the default values for the optional parameters.
     defaultProjName = string("mercator");
     defaultLambda = @(x) x;
+    defaultColormap = string('parula');
     mustBeTextScalar = @(x) ischar(x) || (isstring(x) && isscalar(x));
     % Add optional name-value pairs
     addParameter(inputInfo, 'projection', defaultProjName, mustBeTextScalar);
     addParameter(inputInfo, 'myFunc', defaultLambda, @(x) isa(x, 'function_handle'));
+    addParameter(inputInfo, 'c_map', defaultColormap, mustBeTextScalar);
     parse(inputInfo, varargin{:});
     projection = inputInfo.Results.projection;
     myFunc = inputInfo.Results.myFunc;
+    c_map = inputInfo.Results.c_map;
 
     extract_names = string(fieldnames(extract));
     extract_size = size(extract_names);
@@ -20,7 +23,7 @@ function [] = makeMap_grid(extract, time_period, varargin)
     param_name = extract_names(param_index); 
     hasTime = find(strcmp('time', extract_names));
     if (~isempty(hasTime))
-        string(extract.time)
+        string(extract.time);
         temp_time = string(extract.time);
         time_index  = find(strcmp(time_period, temp_time));
         if (isempty(time_index))
@@ -31,8 +34,10 @@ function [] = makeMap_grid(extract, time_period, varargin)
     no_dims = size(size(extract.(param_name)));
     no_dims = ndims(extract.(param_name));
     indexing = repmat({':'}, 1, (no_dims));
-    if( numel(string(extract.time)) > 1)
-        indexing{1} = time_index; 
+    if (~isempty(hasTime))
+        if( numel(string(extract.time)) > 1)
+            indexing{1} = time_index; 
+        end
     end
     parameter = extract.(param_name)(indexing{:}); 
     parameter = squeeze(parameter);
@@ -45,6 +50,9 @@ function [] = makeMap_grid(extract, time_period, varargin)
     m_proj(projection, 'lon', lon, 'lat', lat);
     m_pcolor(Plg, Plt, parameter);
     shading flat;
+    if (~strcmp(c_map, 'parula'))
+        cmocean(c_map)
+    end
     m_grid;
     m_gshhs_h('patch',[.7 .7 .7]);
     colorbar;

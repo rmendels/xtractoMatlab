@@ -1,4 +1,16 @@
-function returnCode = checkBounds1(dataCoordList, callDims)
+function returnCode = checkBounds(dataCoordList, callDims)
+% Internal function to check if request to xtracto.m,
+% xtracto_3D.m and xtractogon.m are within bounds
+% of the dataset
+%
+% INPUTS:  
+%    dataCoordList: coordinates of the requested dataset from  getfileCoords.m.
+%    callDims:  dimension subset requested in initial call
+%
+% OUTPUT:  
+%     0 if callDims is within bounds
+%     1 if not within bounds
+%
     returnCode = 0;
     dimNames = string(fieldnames(dataCoordList));
     callNames = string(fieldnames(callDims));

@@ -1,7 +1,18 @@
 function result = dynamicFunctionCall(funcName, datasetInfo, parameter, erddapCoord)
-    % varargin contains any additional arguments such as 'tpos', tpos, etc.
-
+% Internal function to mimic R's do_call() function
+% used to call xtracto_3D.m from xtractogon.m
+%
+% INPUT:  
+%    funcName - name of function to call
+%    datasetInfo - return from erddapInfo.m
+%    parameter - name parameter from xtractogon.m
+%    erddapCoord - bounding box that contains polygon from xtractogon.m
+%
+% OUTPUT: 
+%    result of calling funcName with given argument
+%
     % Start with the fixed arguments that are always present
+    disp(erddapCoord)
     f_names = string(fieldnames(erddapCoord));
     coordCell = struct2cell(erddapCoord);
     args = {datasetInfo, parameter, coordCell{1}, coordCell{2}};

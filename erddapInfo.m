@@ -1,6 +1,19 @@
 function [ info ] = erddapInfo( datasetID, varargin )
-    %UNTITLED2 Summary of this function goes here
-    %   Detailed explanation goes here
+% Functon to obtain necessary information about an ERDDAP datasetaaset
+%
+%  INPUT:  datasetID - datasetID of ERDDAP dataset to be accessed
+%          varagin - Base URL of ERDDAP to use
+%                    Default URL - 'https://coastwatch.pfeg.noaa.gov/erddap/'
+% 
+%  OUTPUT:  Struture containing fields
+%              access:  contains base URL and datasetD
+%              dimensionNames:  Names of dataset dmensions
+%              dimensionMin: Minimum valid value for dimension
+%              dimensionMax: Maximum valid value for dimension
+%              variables: parameters in the dataset
+%              cdm_type:  Common Data Model type,  used for checking in othe functions
+%              class: 'erddapInfo' - used to check input to other functions is correct
+%   
     options = weboptions;
     options.Timeout = Inf;
     
