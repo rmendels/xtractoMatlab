@@ -63,9 +63,6 @@ function extractStruct = xtracto_test(datasetInfo, parameter, xpos, ypos, vararg
     track.(yName) = ypos;
     track.(zName) = zpos;
     track.(tName) = tpos;
-    disp(xlen)
-    disp(ylen)
-    disp(zlen)
     if (numel(xlen) == 1)
        xrad(1:numel(xpos)) = xlen;
     else
