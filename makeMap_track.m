@@ -57,5 +57,5 @@ function makeMap_track(track_extract, varargin)
     % Add a colorbar
     colormap(cmap);
     colorbar;
-    caxis([minParm, maxParm]);
+    clim([minParm, maxParm]);
 end

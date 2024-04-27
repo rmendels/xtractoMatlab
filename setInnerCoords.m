@@ -1,5 +1,5 @@
 function callDims = setInnerCoords(track, extract_point_loc, ...
-                         xrad, yrad, zrad);
+                         xrad, yrad, zrad)
     xrad1 = xrad(extract_point_loc);
     yrad1 = yrad(extract_point_loc );
     if (~isempty(zrad)) 

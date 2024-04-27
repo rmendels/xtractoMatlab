@@ -1,4 +1,4 @@
-function matTime = erdap8601(erddapTime)
+function matTime = erddap8601(erddapTime)
     timeSize = numel(erddapTime);
     matTime = zeros(1, timeSize);
     for i=1:timeSize(1)

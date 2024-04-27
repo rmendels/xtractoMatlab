@@ -43,14 +43,3 @@ function erddapStruct = createOutputStructure(parameter, track)
     'requested_date', strings(1, track_length), ...
     'median', NaN(1, track_length ), 'mad', NaN(1, track_length ) );
 end
-
-
-% Function to rename fields of a structure
-function structOut = renameFields(structIn, oldNames, newNames)
-    structOut = struct();
-    for i = 1:length(oldNames)
-        if isfield(structIn, oldNames{i})
-            structOut.(newNames{i}) = structIn.(oldNames{i});
-        end
-    end
-end

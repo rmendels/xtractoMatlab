@@ -12,7 +12,6 @@ function result = dynamicFunctionCall(funcName, datasetInfo, parameter, erddapCo
 %    result of calling funcName with given argument
 %
     % Start with the fixed arguments that are always present
-    disp(erddapCoord)
     f_names = string(fieldnames(erddapCoord));
     coordCell = struct2cell(erddapCoord);
     args = {datasetInfo, parameter, coordCell{1}, coordCell{2}};
@@ -32,7 +31,7 @@ function result = dynamicFunctionCall(funcName, datasetInfo, parameter, erddapCo
         end
     end
     % Append any additional arguments passed to this function
-    save('args.mat','args');
+    %save('args.mat','args');
 
     % Call the target function using feval
     result = feval(funcName, args{:});

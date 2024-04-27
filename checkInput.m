@@ -1,4 +1,18 @@
 function urlbase = checkInput(datasetInfo, parameter, urlbase, callDims)
+% 
+% Interal function to check if input is consistent and properly formed
+% 
+% INPUT:
+%    dataInfo: result of calling erddapInfo()
+%    parameter: name of parameter to extract
+%    urlbase: base URL of the ERDDAP being used.
+%    callDims:  dimension subset requested in initial call
+%
+% OUTPUT:
+%  If check fails an error code
+%  otherwise a possiblly modified urlbase is no trailing /
+%
+
     % Initialize return code for error handling
     errorCode = -999;
     

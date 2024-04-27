@@ -1,4 +1,16 @@
 function [unique_times unique_req_time_pos]  = findUniqueTimes(trackTime, dataCoordList)
+%
+% Find unique times in a track
+%
+% INPUTS:
+%       trackTime: the times in the track
+%       dataCoordList: - dat coordinate values from calling getfileCoords()
+%
+% OUTPUTS:
+%        unique_times: the unique times in the track
+%        unique_req_time_pos: postion of each unique time in the track
+%
+
     % convert times to udt times to do arithmetic
     trackTimeUDT = erddap8601(trackTime);
     % two cases - time is in the dataset
@@ -11,7 +23,8 @@ function [unique_times unique_req_time_pos]  = findUniqueTimes(trackTime, dataCo
         end
         [unique_times, unique_req_time_index, unique_req_time_pos] = unique(request_time);
     else
-    % time is not a coordinat in the datasets
+    % time is not a coordinate in the datasets
+    % such as extracting bathymetry for animal movng through time
         [unique_times, unique_req_time_index, unique_req_time_pos] = unique(trackTime);
     end
 end

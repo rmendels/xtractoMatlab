@@ -30,7 +30,7 @@ function erddapStruct = populateStruct(erddapStruct,  innerData, erddapCoords1, 
 
     % let's go through coordinates
     % 
-    for( i = 1:numel(f_names2))
+    for(i = 1:numel(f_names2))
         if(strcmp(f_names2(i), 'time'))
             if(any(strcmp(f_names1, 'time')))
                 erddapStruct.satellite_date(counter) = erddapCoords1.time(1);

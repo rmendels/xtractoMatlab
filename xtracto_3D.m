@@ -68,8 +68,8 @@ function [extract] = xtracto_3D(datasetInfo, parameter, xpos, ypos, varargin )
     % Here assuming they don't have default values and thus not adding a default value
     % Example: addParameter(p, 'tpos', defaultTpos, @isnumeric);
     % Example: addParameter(p, 'zpos', defaultZpos, @isnumeric);
-    addParameter(inputInfo, 'tpos', [], @(x) iscellstr(x) || isnumeric(x)); 
-    addParameter(inputInfo, 'zpos', [], @(x) iscellstr(x) || isnumeric(x)); 
+    addParameter(inputInfo, 'tpos', [], @(x) iscellstr(x) || isstring(x) || isnumeric(x)); 
+    addParameter(inputInfo, 'zpos', [], @(x) iscellstr(x) || isstring(x) || isnumeric(x)); 
 
     % Parse the varargin input
     parse(inputInfo, varargin{:});
@@ -103,7 +103,7 @@ function [extract] = xtracto_3D(datasetInfo, parameter, xpos, ypos, varargin )
     erddapCoords = findERDDAPcoords(dataCoordList, callDims);  
     
     % build the erddap url
-    myURL = buildURL(datasetInfo,  erddapCoords);
+    myURL = buildURL(datasetInfo,  parameter, erddapCoords);
     fileout='tmp.mat';
     if(iscell(myURL))
         myURL = myURL{1};
@@ -118,10 +118,10 @@ function [extract] = xtracto_3D(datasetInfo, parameter, xpos, ypos, varargin )
     % check if latitude is north-south and rotate if it is
     if (strcmp('latitude', f_names))
        if(extract.latitude(2) < extract.latitude(1))
-         lat_index = find(strcmp('latitude', f_names))
+         lat_index = find(strcmp('latitude', f_names));
          latSize = size(extract.latitude);
          extract.latitude = flipud(extract.latitude);
-         extract.(extract_parameter) = rotatedArrays(extract.(extract_parameter), lat_index);
+         extract.(extract_parameter) = rotatedArray(extract.(extract_parameter), lat_index);
        end
     end
     %  put longitudes back on the requestors scale

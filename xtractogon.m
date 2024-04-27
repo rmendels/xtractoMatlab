@@ -48,8 +48,8 @@ function [extract, xlon, xlat, xtime] = xtractogon(datasetInfo, parameter, xpoly
     % Here assuming they don't have default values and thus not adding a default value
     % Example: addParameter(p, 'tpoly', defaultTpos, @isnumeric);
     % Example: addParameter(p, 'zpos', defaultZpos, @isnumeric);
-    addParameter(inputInfo, 'tpos', [], @(x) iscellstr(x) || isnumeric(x)); 
-    addParameter(inputInfo, 'zpos', [], @(x) iscellstr(x) || isnumeric(x)); 
+    addParameter(inputInfo, 'tpos', [], @(x) iscellstr(x) || isstring(x) || isnumeric(x)); 
+    addParameter(inputInfo, 'zpos', [], @(x) iscellstr(x) || isstring(x) || isnumeric(x)); 
 
     % Parse the varargin input
     parse(inputInfo, varargin{:});
@@ -65,8 +65,6 @@ function [extract, xlon, xlat, xtime] = xtractogon(datasetInfo, parameter, xpoly
     callDims.(yName) = ypoly;
     callDims.(zName) = zpos;
     callDims.(tName) = tpos;
-
-
 
     f_names = fieldnames(callDims);
     xmin = min(xpoly); 
@@ -87,7 +85,6 @@ function [extract, xlon, xlat, xtime] = xtractogon(datasetInfo, parameter, xpoly
         [max_time,  max_index] = max(temp_time);
         erddapCoord.time = [tpos(min_index) tpos(max_index)];
     end
-
     % Initialize an empty cell array for extra dimension
 
     extract = dynamicFunctionCall('xtracto_3D', datasetInfo, parameter, erddapCoord);
@@ -101,20 +98,19 @@ function [extract, xlon, xlat, xtime] = xtractogon(datasetInfo, parameter, xpoly
     else
         no_time = 1;
     end
-    
     % make sure polygon is closed; if not, close it.
-    if (xpoly(end) ~= xpoly(1)) | (ypoly(end) ~= ypoly(1)) 
+    if (xpoly(end) ~= xpoly(1)) || (ypoly(end) ~= ypoly(1)) 
          xpoly(end+1) = xpoly(1);
          ypoly(end+1) = ypoly(1);
     end
     
     % make mask (1 = in or on), (nan = out)
-    [xlon xlat] = meshgrid(extract.longitude, extract.latitude);
+    [xlon, xlat] = meshgrid(extract.longitude, extract.latitude);
     inPoly = inpolygon(xlon, xlat, xpoly, ypoly);
-    if (no_time == 1)
+    if(no_time == 1)
         extract.(parameter)(~inPoly) = NaN;
     else
-        for (i = 1:no_time)
+        for(i = 1:no_time)
             extract.(parameter)(i, ~inPoly) = NaN;    
         end
     end

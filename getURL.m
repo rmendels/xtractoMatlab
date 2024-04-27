@@ -1,4 +1,16 @@
 function [extract] = getURL(datasetInfo, myURL, destfile)
+%
+%  Function to call ERDDAP URL and read results into Workspace
+%
+% INPUTS:
+%       datasetInfo - output from calling erddapInfo()
+%       myURL - ERDDAP URL from buildURL()
+%       destfile - where to save the downloaded Matlag file
+%
+% OUTPUTS:
+%        extract - structure containing all the coordinates plus the extracted data.
+%
+
      options = weboptions;
      options.Timeout = Inf;
      datasetID = datasetInfo.access.datasetID;

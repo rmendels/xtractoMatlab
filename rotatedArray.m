@@ -1,4 +1,4 @@
-function rotatedArray = rotateDimension(myArray, dimToRotate)
+function rotatedArray = rotatedArray(myArray, dimToRotate)
     % Determine the number of dimensions in the input array
     numDims = ndims(myArray);
     % Generate the original order of dimensions

@@ -1,6 +1,14 @@
 function erddapCoord = findERDDAPcoords(dataCoordList, callDims)
-    % Initialize indices and coordinates with NaNs
-    %erddapCoord = zeroes(4,2);
+%
+% Function to find the nearest dataset coordinates to those given in the callDims
+%
+% INPUTS:
+%    dataCoordList: dataset coordinate values from calling getfileCoords()
+%    callDims:  coordinate values given in initial function call
+%
+% OUTPUTS:
+%    erddapCoord: closest coordinates is dataset to use in ERDDAP call
+
     coords = string(fieldnames(dataCoordList));
     callFields = string(fieldnames(callDims));
     for i = 1:numel(coords)  
@@ -18,20 +26,21 @@ function erddapCoord = findERDDAPcoords(dataCoordList, callDims)
             temp_time2 = string(dataCoordList.('time')(newIndex));
             erddapCoord.time = [temp_time1 temp_time2];
          else
-         if (numel(dataCoordList.(coords(i))) == 1)
-             erddapCoord1 = dataCoordList.(coords(i));
-             erddapCoord2 = dataCoordList.(coords(i));
-         else
-              [~, newIndex] = min(abs(dataCoordList.(coords(i)) - temp_limit(1)));
-              erddapCoord1 = dataCoordList.(coords(i))(newIndex);
-              if newIndex == 1 && abs(dataCoordList.(coords(i))(newIndex) - temp_limit(1)) < 0.0001
-                  erddapCoord1 = temp_limit(1);
-              end
-              [~, newIndex] = min(abs(dataCoordList.(coords(i)) - temp_limit(2)));
-              erddapCoord2 = dataCoordList.(coords(i))(newIndex);
-              if newIndex == length(dataCoordList.(coords(i))) && abs(dataCoordList.(coords(i))(newIndex) - temp_limit(2)) < 0.0001
-                  erddapCoord2 = temp_limit(2);
-              end
+             if (isscalar(dataCoordList.(coords(i))))
+                 erddapCoord1 = dataCoordList.(coords(i));
+                 erddapCoord2 = dataCoordList.(coords(i));
+             else
+                  [~, newIndex] = min(abs(dataCoordList.(coords(i)) - temp_limit(1)));
+                  erddapCoord1 = dataCoordList.(coords(i))(newIndex);
+                  if newIndex == 1 && abs(dataCoordList.(coords(i))(newIndex) - temp_limit(1)) < 0.0001
+                      erddapCoord1 = temp_limit(1);
+                  end
+                  [~, newIndex] = min(abs(dataCoordList.(coords(i)) - temp_limit(2)));
+                  erddapCoord2 = dataCoordList.(coords(i))(newIndex);
+                  if newIndex == length(dataCoordList.(coords(i))) && abs(dataCoordList.(coords(i))(newIndex) - temp_limit(2)) < 0.0001
+                      erddapCoord2 = temp_limit(2);
+                  end
+             end
          end
          erddapCoord.(coords(i)) = [erddapCoord1 erddapCoord2];
     end             

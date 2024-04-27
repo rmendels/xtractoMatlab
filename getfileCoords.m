@@ -1,4 +1,15 @@
 function [coordinate_info] = getfileCoords(datasetInfo)
+%
+%  Function to get the actual coordinate values of a dataset
+%
+% INPUTS:
+%       datasetInfo: output from calling erddapInfo()
+%
+% OUTPUTS:
+%        coordinate_info: dataset coordinat values
+%
+
+
     options = weboptions;
     options.Timeout = Inf;
     urlbase = datasetInfo.access.urlBase;
@@ -12,7 +23,6 @@ function [coordinate_info] = getfileCoords(datasetInfo)
         myURL=strcat(urlbase, 'griddap/', datasetID, '.csv?', dim_name, '[0:1:last]');
         temp=webread(myURL,options);
         temp1=table2array(temp(1:end, 1));
-        
         if (strcmp(dim_name, 'time'))
             timeLength = size(temp1);
             %udtime = NaN(timeLength(1), 1);
