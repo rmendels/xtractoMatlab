@@ -1,4 +1,14 @@
 function rotatedArray = rotatedArray(myArray, dimToRotate)
+% Internal function rotate an array along a given dimension
+% 
+% INPUTS:
+%       myArray - data array to rotate
+%       dimToRotate - dimension along which to perform rotation
+%
+% OUTPUTS:
+%        rotatedArray  - data array rotated in the given dimension
+%
+
     % Determine the number of dimensions in the input array
     numDims = ndims(myArray);
     % Generate the original order of dimensions

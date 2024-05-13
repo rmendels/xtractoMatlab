@@ -31,7 +31,6 @@ function result = dynamicFunctionCall(funcName, datasetInfo, parameter, erddapCo
         end
     end
     % Append any additional arguments passed to this function
-    %save('args.mat','args');
 
     % Call the target function using feval
     result = feval(funcName, args{:});

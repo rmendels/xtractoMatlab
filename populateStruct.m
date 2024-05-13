@@ -1,19 +1,32 @@
 function erddapStruct = populateStruct(erddapStruct,  innerData, erddapCoords1, innerDim, t_value, counter)
-% FIELDS:
-%     mean_parameter - mean of the parameter within the bounds of that time period
-%     std_parameter - standard deviation of the parameter within the bounds of that time period
-%     n - number of observations in the extract at each time period
-%     satellite_date - time of the actual request to the dataset at ech time period
-%     requested_xName_min - minimun x-axis value in request at each time period
-%     requested_xName_max - maximum x-axis value in request at each time period
-%     requested_yName_min - minimun y-axis value in request at each time period
-%     requested_yName_max - maximum y-axis value in request at each time period
-%     requested_zName_min - minimun z-axis value in request at each time period
-%     requested_zName_max - maximum z-axis value in request at each time period
-%     requested_date - date given in track
-%     median - median of the parameter within the bounds of that time period
-%     mad - Mean absolute deviation of the parameter within the bounds of that time period
 %
+% Internal function to populate output structure with the results from ech tme period
+%
+% INPUTS:
+%        erddapStruct - output structure
+%          FIELDS:
+%          mean_parameter - mean of the parameter within the bounds of that time period
+%          std_parameter - standard deviation of the parameter within the bounds of that time period
+%          n - number of observations in the extract at each time period
+%          satellite_date - time of the actual request to the dataset at ech time period
+%          requested_xName_min - minimun x-axis value in request at each time period
+%          requested_xName_max - maximum x-axis value in request at each time period
+%          requested_yName_min - minimun y-axis value in request at each time period
+%          requested_yName_max - maximum y-axis value in request at each time period
+%          requested_zName_min - minimun z-axis value in request at each time period
+%          requested_zName_max - maximum z-axis value in request at each time period
+%          requested_date - date given in track
+%          median - median of the parameter within the bounds of that time period
+%          mad - Mean absolute deviation of the parameter within the bounds of that time period
+%          innerData -  data extracd for that time period
+%          erddapCoords1 - actual coordinates uses in ERDDAP™ request
+%          innerDim - dataset dimensions
+%          t_value - time of request
+%          counter - position in structure
+%
+% OUTPUTS:
+%         erddapStruct - updated structure
+% 
     f_names = string(fieldnames(erddapStruct));
     f_names1 = string(fieldnames(erddapCoords1));
     f_names2 = string(fieldnames(innerDim));  

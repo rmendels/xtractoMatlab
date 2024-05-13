@@ -1,5 +1,5 @@
 function [extract] = xtracto_3D(datasetInfo, parameter, xpos, ypos, varargin )
-% Example script to get the large chunks of data via SWFSC/ERD THREDDS server
+% Function to get gridded from an ERDDAP srver
 %
 % INPUTS:  
 %          info = result of call to function info()
@@ -70,6 +70,7 @@ function [extract] = xtracto_3D(datasetInfo, parameter, xpos, ypos, varargin )
     % Example: addParameter(p, 'zpos', defaultZpos, @isnumeric);
     addParameter(inputInfo, 'tpos', [], @(x) iscellstr(x) || isstring(x) || isnumeric(x)); 
     addParameter(inputInfo, 'zpos', [], @(x) iscellstr(x) || isstring(x) || isnumeric(x)); 
+    addParameter(inputInfo, 'urlbase', defaultUrlName, @(x) iscellstr(x) || isstring(x) ); 
 
     % Parse the varargin input
     parse(inputInfo, varargin{:});
@@ -81,12 +82,14 @@ function [extract] = xtracto_3D(datasetInfo, parameter, xpos, ypos, varargin )
     tName = inputInfo.Results.tName;
     tpos = inputInfo.Results.tpos;
     zpos = inputInfo.Results.zpos;
+    urlbase = inputInfo.Results.urlbase;
     callDims.(xName) = xpos;
     callDims.(yName) = ypos;
     callDims.(zName) = zpos;
     callDims.(tName) = tpos;
     
-    datasetInfo1 = datasetInfo;
+    %datasetInfo1 = datasetInfo;
+    urlbase = checkInput(datasetInfo, parameter, urlbase, callDims, 0, 0);
     dataCoordList = getfileCoords(datasetInfo);
     if (isnumeric(dataCoordList) ) 
         error("Error retrieving coordinate variable");
@@ -95,11 +98,11 @@ function [extract] = xtracto_3D(datasetInfo, parameter, xpos, ypos, varargin )
     time_dim = find(strcmp('time', dataCoordList));
         
     %check that coordinate bounds are contained in the dataset
-    %result = checkBounds1(info, tposLim, yposLim, xposLim);
-    %if (isnan(result))
-    %  disp('Coordinates out of dataset bounds - see messages above');
-    %  return;
-    %end
+    result = checkBounds(dataCoordList, callDims);
+    if (result == 1)
+        disp('Coordinates out of dataset bounds - see messages above');
+        return;
+    end
     erddapCoords = findERDDAPcoords(dataCoordList, callDims);  
     
     % build the erddap url

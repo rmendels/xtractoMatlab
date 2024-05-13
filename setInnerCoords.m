@@ -1,5 +1,7 @@
 function callDims = setInnerCoords(track, extract_point_loc, ...
                          xrad, yrad, zrad)
+% Internal function to set 'inner' coordianates from 'xtracto()' track
+%
     xrad1 = xrad(extract_point_loc);
     yrad1 = yrad(extract_point_loc );
     if (~isempty(zrad)) 

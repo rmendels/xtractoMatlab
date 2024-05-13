@@ -1,4 +1,19 @@
 function makeMap_track(track_extract, varargin)
+% function to map results from either 'xtracto()'
+%
+% INPUTS:
+%        track_extract - result from  'xtracto()'
+%        varargin - optional arguments
+%                'projection' - map projection, default 'mercator'
+%                'myFunc' - function to transform the data, default none
+%                'c_map' - colormap to use in map,  default 'parula'
+% 
+% OUTPUT:
+%        map of track
+%
+
+
+
     inputInfo = inputParser;
 
     % Set the default values for the optional parameters.

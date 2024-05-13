@@ -41,7 +41,7 @@ function erddapCoord = findERDDAPcoords(dataCoordList, callDims)
                       erddapCoord2 = temp_limit(2);
                   end
              end
+             erddapCoord.(coords(i)) = [erddapCoord1 erddapCoord2];
          end
-         erddapCoord.(coords(i)) = [erddapCoord1 erddapCoord2];
     end             
 end

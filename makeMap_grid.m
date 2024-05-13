@@ -1,6 +1,17 @@
 function [] = makeMap_grid(extract, time_period, varargin)
-%UNTITLED3 Summary of this function goes here
-%   Detailed explanation goes here
+% function to map results from either 'xtracto_3D()' or 'xtratogon()'
+%
+% INPUTS:
+%        extract - result from either 'xtracto_3D()' or 'xtratogon()'
+%        time_period - which time perio to map
+%        varargin - optional arguments
+%                'projection' - map projection, default 'mercator'
+%                'myFunc' - function to transform the data, default none
+%                'c_map' - colormap to use in map,  default 'parula'
+% 
+% OUTPUT:
+%        map of data
+%
     inputInfo = inputParser;
 
     % Set the default values for the optional parameters.

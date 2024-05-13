@@ -1,5 +1,14 @@
 function tcoord1 = removeLast(isotime, tcoord1)
-    % MATLAB version of the removeLast function
+% Internal function to convert a time request of 'last' to actual time
+%
+% INPUTS:
+%   isotime - dataset timess in ISO format 
+%   tcoord1 - request times
+%
+% OUTPUTS:
+%        tcoord1 - time coordinate with 'last' converted to ISO time.
+%
+
     lenTime = length(isotime);
 
     for i = 1:2

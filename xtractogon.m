@@ -66,6 +66,25 @@ function [extract, xlon, xlat, xtime] = xtractogon(datasetInfo, parameter, xpoly
     callDims.(zName) = zpos;
     callDims.(tName) = tpos;
 
+    if(~any(strcmp('class', fieldnames(datasetInfo))))
+        disp('error - datasetInfo is not a valid info structure from erddapInfo()')
+        error('Function terminated with error code %d', errorCode);
+    end
+
+
+    % Check that the dataset is a grid
+    if(~strcmp(datasetInfo.cdm_type, 'Grid'))
+        disp('error - dataset is not a Grid');
+        error('Function terminated with error code %d', errorCode);
+    end
+    
+    % check polygons are of same length
+    if(numel(xpoly) ~= numl(ypoly))
+        disp('xpoly and ypoly of unequal length')
+        error('function terminated')
+    end
+
+
     f_names = fieldnames(callDims);
     xmin = min(xpoly); 
     xmax = max(xpoly);
