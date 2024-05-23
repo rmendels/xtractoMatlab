@@ -90,8 +90,9 @@ function extractStruct = xtracto(datasetInfo, parameter, xpos, ypos, varargin)
     
     % check the arrays are the same size
     arraySizes = structfun(@(x) length(x), track, 'UniformOutput', true);
-    disp(arraySizes)
-    areSameSize = all(arraySizes == arraySizes(1))
+    nonZeroElements = arraySizes ~= 0;
+    arraySizes = arraySizes(nonZeroElements);
+    areSameSize = all(arraySizes == arraySizes(1));
     if(~areSameSize)
         disp('Lengths of track variables do not agree')
         disp("function stops")
@@ -115,7 +116,7 @@ function extractStruct = xtracto(datasetInfo, parameter, xpos, ypos, varargin)
         if(length(zlen) == 1)
             disp('warning - zlen has a single value')
             disp('xlen and ylen have length greater than 1')
-            disp('zlen will be extended to be same length with repeated value')
+            disp('zlen will be extended to be same length with value 0')
         end
     end
     

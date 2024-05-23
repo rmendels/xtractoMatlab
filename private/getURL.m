@@ -17,9 +17,10 @@ function [extract] = getURL(datasetInfo, myURL, destfile)
      F = websave(destfile, myURL, options);
      extract = load(F);
 %  remove extra layer of structure
-    extract = extract.(datasetID);
+    tempName = string(fieldnames(extract));
+    extract = extract.(tempName);
 %  Matlab likes doubles
-    f_names = fieldnames(extract); 
+    f_names = string(fieldnames(extract)); 
     for i = 1:(numel(f_names))
         if (~strcmp('time', f_names(i)))
             extract.(f_names{i}) = double(extract.(f_names{i}));

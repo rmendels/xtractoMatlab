@@ -13,6 +13,11 @@ function returnCode = checkBounds(dataCoordList, callDims)
 %
     returnCode = 0;
     dimNames = string(fieldnames(dataCoordList));
+    lat_name = string('latitude');
+    if (~ismember(lat_name, dimNames))
+       disp('not lat-lon');
+       return;
+    end
     %callNames = string(fieldnames(callDims));
     dimLen = numel(dimNames);
     for(i = 1:dimLen)
@@ -23,7 +28,8 @@ function returnCode = checkBounds(dataCoordList, callDims)
             % Get user requested bounds and convert to numeric
             udt_coord = erddap8601(callDims.time);
             % Convert dataset bounds from ISO 8601 to MATLAB datenum
-            dataset_times = erddap8601(dataCoordList.(dimNames(i)));
+            %disp(dataCoordList.time)
+            dataset_times = erddap8601(string(dataCoordList.time));
             if any(isnan(udt_coord ))
                 disp('Invalid time given\n');
                 disp('Execution will halt\n');
@@ -36,9 +42,9 @@ function returnCode = checkBounds(dataCoordList, callDims)
             max_data_coord = max(dataset_times);
             if (min_call_coord < min_data_coord) || (max_call_coord > max_data_coord)
                 disp('Dimension coordinate out of bounds\n');
-                disp('Dimension name: %s\n', dimNames(i));
-                disp('Given coordinate bounds: %s to %s\n', datetime(min_call_coord), datetime(max_call_coord));
-                disp('ERDDAP datasets bounds: %s to %s\n', datetime(min_data_coord), datetime(max_data_coord));
+                fprintf('Dimension name: %s\n', dimNames(i));
+                %fprintf('Given coordinate bounds: %s to %s\n', callDims.time(1), callDims.time(2)));
+                %fprintf('ERDDAP datasets bounds: %s to %s\n', datetime(min_data_coord), datetime(max_data_coord));
                 returnCode = 1;
                 return;
             end             
@@ -51,9 +57,9 @@ function returnCode = checkBounds(dataCoordList, callDims)
             max_data_coord = max(dataCoordList.(dimNames(i)));
             if (min_call_coord < min_data_coord) || (max_call_coord > max_data_coord)
                 disp('Dimension coordinate out of bounds\n');
-                disp('Dimension name: %s\n', dimNames(i));
-                disp('Given coordinate bounds: %f to %f\n', min_call_coord, max_call_coord);
-                disp('ERDDAP datasets bounds: %f to %f\n', min_data_coord, max_data_coord);
+                fprintf('Dimension name: %s\n', dimNames(i));
+                fprintf('Given coordinate bounds: %f to %f\n', min_call_coord, max_call_coord);
+                fprintf('ERDDAP datasets bounds: %f to %f\n', min_data_coord, max_data_coord);
                 returnCode = 1;
                 return;
             end
