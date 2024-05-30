@@ -1,5 +1,6 @@
 function extractStruct = xtracto(datasetInfo, parameter, xpos, ypos, varargin)
-% Script to grab data along a user specified track
+%
+% Function to extract data along a user specified track from an ERDDAP™ server
 %
 % INPUTS: 
 %        datasetInfo - result from callng 'erddapInfo()'    
@@ -18,10 +19,10 @@ function extractStruct = xtracto(datasetInfo, parameter, xpos, ypos, varargin)
 %        'xlen'- size of box around x-coordinate to make extract, default 0.
 %        'ylen'- size of box around y-coordinate to make extract, default 0.
 %        'zlen'- size of box around z-coordinate to make extract, default 0.
-%        'urlbase' - base URL of ERDDAP server, default 'https://coastwatch.pfeg.noaa.gov/erddap/'
+%        'urlbase' - base URL of ERDDAP™ server, default 'https://coastwatch.pfeg.noaa.gov/erddap/'
 %
 % OUTPUT:
-%    structure where each field is of the same length as th track
+%    structure where each field is of the same length as the track
 %
 % FIELDS:
 %     mean_parameter - mean of the parameter within the bounds of that time period

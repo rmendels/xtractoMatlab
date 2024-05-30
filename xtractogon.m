@@ -1,28 +1,32 @@
 function [extract, xlon, xlat, xtime] = xtractogon(datasetInfo, parameter, xpoly, ypoly, varargin);
 % 
-% Function XTRACTOGON downloads a 3-D data chunk 
-% and applies a two-D spatial mask along the t-axis.
+% Function to extract data in a polygon from an ERDDAP™ server
 %
-% INPUTS:
-% 
-% tpos gives min/max time in matlab days (e.g., datenum (year,month,day))
-% id - numerical or string code for remote data set - complete list is given
-%          in the xtracto_3D_bdap.m 
-% polyfile = xy vector file (space-delimitered lon lat, ) that defines
-%             the polygon.  If it is not closed, the program will do this
-%                           automatically.
+% INPUTS: 
+%        datasetInfo - result from callng 'erddapInfo()'    
+%        parameter - name of parameter to extract
+%        xpoly - array of x-axis (usually longitude) polygon values
+%        ypoly - array of y-axis (usually latitude)  polygon values
 %
-%  OUTPUTS:
-%  extract(t,z,y,x) = 4-Dimensional array containing desired data.
-%  xlon, xlat, xtime - basis vectors of extract array.
-%    For satellite data, the only index of z is 1, and z(1) = 0.  Th
+% OPTIONAL INPUTS:
+%  optional inputs give by passing the name of the input in quotes
+%  followd by the values.  Order does not matter.
+%        'tpos' - array of size 2 of time bounds
+%        'zpos' - array of size 2 of other dimension bound,  usually 'altitude' or 'depth'
+%                 each element must be the same
+%        'xName' - name of x-coordinate,  default 'longitude'
+%        'yName' - name of y-coordinate,  default 'latitude'
+%        'zName' - name of z-coordinate,  default 'altitude'
+%        'tName' - name of time cordinat, default 'time'
+%        'urlbase' - base URL of ERDDAP™ server, default 'https://coastwatch.pfeg.noaa.gov/erddap/'
 %
-%  Dependencies:  requires xtracto_3D_bdap.m
-%    http://coastwatch.pfel.noaa.gov/xfer/xtracto/matlab
-%
-% CoastWatch
-% 15 Mar 08
-% DGF
+% OUTPUT:
+%    structure containing:
+%         tpos values  - 1D array
+%         zpos values  - 1D array
+%         ypos values  - 1D array
+%         xpos values  - 1D array
+%         parameter values - matrix with same numbr of dimension as the dataset
 %
 
     % Create an instance of the inputParser class.

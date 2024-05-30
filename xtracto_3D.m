@@ -1,49 +1,31 @@
 function [extract] = xtracto_3D(datasetInfo, parameter, xpos, ypos, varargin )
-% Function to get gridded from an ERDDAP srver
 %
-% INPUTS:  
-%          info = result of call to function info()
-%          parameter = name of parameter to use from dataset referenced in
-%          info
-%          xpos = [xmin xmax] = longitude in 0 to 360 E lon, or -180 to 180 E lon
-%          ypos = [ymin ymax] = latitude -90 to 90 N lat
-%          tpos = [tpos tmax] = time, in matlab days  
-% 
+% Function to extract gridded from an ERDDAP™ server
+%
+% INPUTS: 
+%        datasetInfo - result from callng 'erddapInfo()'    
+%        parameter - name of parameter to extract
+%        xpos - array of size 2 of x-axis (usually longitude) bounds
+%        ypos - array of size 2 of y-axis (usually latitude)  bounds
+% OPTIONAL INPUTS:
+%  optional inputs give by passing the name of the input in quotes
+%  followd by the values.  Order does not matter.
+%        'tpos' - array of size 2 of time bounds
+%        'zpos' - array of size 2 of other dimension bound,  usually 'altitude' or 'depth'
+%        'xName' - name of x-coordinate,  default 'longitude'
+%        'yName' - name of y-coordinate,  default 'latitude'
+%        'zName' - name of z-coordinate,  default 'altitude'
+%        'tName' - name of time cordinat, default 'time'
+%        'urlbase' - base URL of ERDDAP™ server, default 'https://coastwatch.pfeg.noaa.gov/erddap/'
+%
 % OUTPUT:
+%    structure containing:
+%         tpos values  - 1D array
+%         zpos values  - 1D array
+%         ypos values  - 1D array
+%         xpos values  - 1D array
+%         parameter values - matrix with same numbr of dimension as the dataset
 %
-%  Extract = 4 dimensional array
-%            index 1 = time dimension of output array
-%            index 2 = depth dimension of output array
-%            index 3 = latitude dimension of output array
-%            index 4 = longitude dimension of output array
-%
-%  lon = longitude vector (basis of column 4)
-%  lat = latitude vector (basis of col 3)
-%  time = time vector (basis for column 1)
-% 
-%
-% Sample Calls:
-%
-% to extract Seawifs 8-day Primary Productivity 
-% [extract] = xtracto_3D(xpos,ypos,tpos,'41');
-%
-%  to extract pathfinder SST 8-day mean data 
-%  [extract] = xtracto_3D(xpos,ypos,tpos,'18');
-%
-% %
-% see the following link to get data codes and full data set information
-% 
-%
-% V0.1  17 Aug 2006.
-% CoastWatch/DGF
-% v1.0 DGF  22 Feb 2007 - Cleaned up code and help
-% v1.1 DGF  27 Feb 2007 - More cleaning
-% v1.2 DGF  9 June 2007 - tweaked the dataid handling to pass
-%                         through CWBrowser requests 
-% v1.3 DGF 13 May 2011  - adjusted script to handle adjustment to coastwatch server
-%tpos{1} = '2006-05-05';
-%tpos{2} = '2006-06-21';
-%extract=xtracto_3D([230 240], [40 45],tpos, 20);
 
     % Create an instance of the inputParser class.
     inputInfo = inputParser;
