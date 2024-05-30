@@ -83,7 +83,7 @@ function [extract, xlon, xlat, xtime] = xtractogon(datasetInfo, parameter, xpoly
     end
     
     % check polygons are of same length
-    if(numel(xpoly) ~= numl(ypoly))
+    if(numel(xpoly) ~= numel(ypoly))
         disp('xpoly and ypoly of unequal length')
         error('function terminated')
     end

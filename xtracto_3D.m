@@ -7,6 +7,7 @@ function [extract] = xtracto_3D(datasetInfo, parameter, xpos, ypos, varargin )
 %        parameter - name of parameter to extract
 %        xpos - array of size 2 of x-axis (usually longitude) bounds
 %        ypos - array of size 2 of y-axis (usually latitude)  bounds
+%
 % OPTIONAL INPUTS:
 %  optional inputs give by passing the name of the input in quotes
 %  followd by the values.  Order does not matter.
